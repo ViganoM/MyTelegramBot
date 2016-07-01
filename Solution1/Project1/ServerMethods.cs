@@ -17,6 +17,7 @@ namespace Project1 {
         public static Dictionary<int, int> lastUpdate { get; private set; } = new Dictionary<int, int>();
 
         public enum parse_mode { Markdown, HTML }
+        static List<string> HTMLstyle = new List<string>()  { "b", "strong", "i", "em", "a", "code", "pre" };
 
         static public getUpdates GetUpdates(int limit = 100) {
             string argument = string.Format("?limit={0}", limit);
@@ -69,28 +70,38 @@ namespace Project1 {
         }
 
         static public Message sendMessage(int chat_id, string text, int reply_to_message_id = -1) {
+            TextCleaner(ref text);
             string argument = string.Format("?chat_id={0}&text= {1}", chat_id, text);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
         }
         static public Message sendMessage(int chat_id, string text, parse_mode parse_mode, int reply_to_message_id = -1) {
+            TextCleaner(ref text);
             string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}", chat_id, text, parse_mode);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
         }
         static public Message sendMessage(int chat_id, string text, bool disable_notification, int reply_to_message_id = -1) {
+            TextCleaner(ref text);
             string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}", chat_id, text, disable_notification);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
         }
         static public Message sendMessage(int chat_id, string text, parse_mode parse_mode, bool disable_notification, int reply_to_message_id = -1) {
+            TextCleaner(ref text);
             string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}&disable_notification={3}", chat_id, text, parse_mode, disable_notification);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
+        }
+        static public string TextCleaner(ref string text) {
+            text = text.Replace("&", "");
+            text = text.Replace("\"", "&quot");
+            text = text.Replace("€", "&euro");
+            return text;
         }
         static Message sendMessage(string argument) {
             string response = new WebClient().DownloadString(website + "sendMessage" + argument);
