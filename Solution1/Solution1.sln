@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project1", "Project1\Project1.csproj", "{40154CA0-7922-4F82-9446-E3C567285097}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "myTelegramBot", "Project1\myTelegramBot.csproj", "{40154CA0-7922-4F82-9446-E3C567285097}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JSONs", "JSONs", "{920CB51D-C6D2-49DF-9633-7B0F67DFE21F}"
+	ProjectSection(SolutionItems) = preProject
+		getme.json = getme.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
