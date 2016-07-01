@@ -14,7 +14,7 @@ namespace Project1 {
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
         const string website = "https://api.telegram.org/bot"+token+"/";
 
-        static Dictionary<int,int> lastUpdate = new Dictionary<int, int>();
+        public static Dictionary<int, int> lastUpdate { get; private set; } = new Dictionary<int, int>();
 
         public enum parse_mode { Markdown, HTML }
 
@@ -26,19 +26,35 @@ namespace Project1 {
             string argument = string.Format("?offset={0}&limit={1}", offset, limit);
             return GetUpdates(argument);
         }
-        static public getUpdates GetUpdatesbyChat(int chat_id, int limit=100) {
+        static public getUpdates GetUpdatesByChat(int chat_id, int limit = 100) {
             string argument = string.Format("?limit={0}", limit);
-            getUpdates getUpdates = GetUpdates(argument).result;
-            for (int n=getUpdates.result.cou
-
-        } 
-        static public getUpdates GetLastUpdatebyChat(int chat_id) {
-
+            getUpdates getUpdate = GetUpdates(argument);
+            for ( int n = getUpdate.result.Count - 1 ; n >= 0 ; n-- )
+                if ( getUpdate.result[n].message.chat.id != chat_id )
+                    getUpdate.result.RemoveAt(n);
+            return getUpdate;
+        }
+        static public Update GetLastUpdateByChat(int chat_id, bool veryLast = false) {
+            string argument;
+            if ( veryLast )
+                argument = string.Format("?offset={0}", lastUpdate[chat_id] + 1);
+            else
+                argument = string.Format("?offset={0}", lastUpdate[chat_id]);
+            List<Update> UpdateList = GetUpdates(argument).result;
+            for ( int n = UpdateList.Count - 1 ; n >= 0 ; n-- )
+                if ( UpdateList[n].message.chat.id != chat_id )
+                    UpdateList.RemoveAt(n);
+            if ( UpdateList.Count > 1 )
+                throw new Exception("too many Update objects returning in GetLastUpdateByChat method");
+            if ( UpdateList.Count == 0 )
+                return null;
+            return UpdateList[UpdateList.Count - 1];
         }
         static getUpdates GetUpdates(string argument) {
             string response = new WebClient().DownloadString(website + "getUpdates" + argument);
             getUpdates getUpdates = new JavaScriptSerializer().Deserialize<getUpdates>(response);
-            foreach ( Update update in getUpdates.result ) {
+            for ( int n = getUpdates.result.Count - 1 ; n >= 0 ; n-- ) {
+                Update update = getUpdates.result[n];
                 if ( !lastUpdate.ContainsKey(update.message.chat.id) )
                     lastUpdate.Add(update.message.chat.id, update.update_id);
                 if ( update.update_id > lastUpdate[update.message.chat.id] )
@@ -53,7 +69,7 @@ namespace Project1 {
         }
 
         static public Message sendMessage(int chat_id, string text, int reply_to_message_id = -1) {
-            string argument = string.Format("?chat_id={0}&text={1}", chat_id, text);
+            string argument = string.Format("?chat_id={0}&text= {1}", chat_id, text);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
