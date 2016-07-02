@@ -1,0 +1,4 @@
+myTelegraBotAPP.MainActivity, myTelegraBotAPP;md5816f022571598dd5bbd63b13cb465501.MainActivity
+myTelegraBotAPP.MainActivity, myTelegraBotAPP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null;md5816f022571598dd5bbd63b13cb465501.MainActivity
+myTelegraBotAPP.MainActivity;md5816f022571598dd5bbd63b13cb465501.MainActivity
+mytelegrabotapp.MainActivity;md5816f022571598dd5bbd63b13cb465501.MainActivity

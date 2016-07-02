@@ -8,7 +8,7 @@ using System.Net;
 using System.Web.Script.Serialization;
 
 
-namespace Project1 {
+namespace myTelegramBot {
     class ServerMethods {
 
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
