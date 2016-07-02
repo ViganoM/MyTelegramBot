@@ -45,6 +45,7 @@
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -71,6 +72,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Artistic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Project1\myTelegramBot.csproj">
+      <Project>{40154ca0-7922-4f82-9446-e3c567285097}</Project>
+      <Name>myTelegramBot</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

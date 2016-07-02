@@ -12,15 +12,20 @@ using System.Linq;
 using JsonTypes;
 
 namespace myTelegramBot {
-    class Program {
+   public class Program {
+        /*//use this to STOP Updater loop*/
+        public static bool run { private get; set; }
+
 
         static void Main(string[] args) {
             if ( ServerMethods.GetMe().ok )
-             new Program().Updater();
-            //Console.ReadKey();
+             Updater();
         }
-        void Updater() {
+
+        /*//use this to START the Updarer loop*/
+        public static void Updater() {
             ServerMethods.GetUpdates(0, 1000);
+            run = true;
             while ( true ) {
                 if ( ServerMethods.lastUpdate.Count == 0 )
                     ServerMethods.GetUpdates(0, 1000);
@@ -32,7 +37,7 @@ namespace myTelegramBot {
                 Thread.Sleep(100);
             }
         }
-    //    void 
+    
     }
 }
 

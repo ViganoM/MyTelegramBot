@@ -7,9 +7,8 @@ using System.Web;
 using System.Net;
 using System.Web.Script.Serialization;
 
-
 namespace myTelegramBot {
-    class ServerMethods {
+   public class ServerMethods {
 
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
         const string website = "https://api.telegram.org/bot"+token+"/";

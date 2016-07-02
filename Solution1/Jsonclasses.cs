@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JsonTypes {
     //getMe
-    class getMe {
+    public class getMe {
         public bool ok { get; set; }
         public User result { get; set; }
     }
