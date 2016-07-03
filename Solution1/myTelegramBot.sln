@@ -5,13 +5,6 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "myTelegramBot", "Project1\myTelegramBot.csproj", "{40154CA0-7922-4F82-9446-E3C567285097}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JSONs", "JSONs", "{920CB51D-C6D2-49DF-9633-7B0F67DFE21F}"
-	ProjectSection(SolutionItems) = preProject
-		getme.json = getme.json
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "myTelegraBotAPP", "myTelegraBotAPP\myTelegraBotAPP.csproj", "{04A7A9FA-35AE-4AEC-9705-4599750C52B5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,12 +15,6 @@ Global
 		{40154CA0-7922-4F82-9446-E3C567285097}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40154CA0-7922-4F82-9446-E3C567285097}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40154CA0-7922-4F82-9446-E3C567285097}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04A7A9FA-35AE-4AEC-9705-4599750C52B5}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
