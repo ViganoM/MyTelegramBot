@@ -8,6 +8,7 @@ using System.Web.Script.Serialization;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows.Forms;
 using System.Linq;
 using JsonTypes;
 
@@ -20,6 +21,7 @@ namespace myTelegramBot {
         static void Main(string[] args) {
             if ( ServerMethods.GetMe().ok )
              Updater();
+            
         }
 
         /*//use this to START the Updarer loop*/
@@ -30,10 +32,14 @@ namespace myTelegramBot {
                 if ( ServerMethods.lastUpdate.Count == 0 )
                     ServerMethods.GetUpdates(0, 1000);
                 List<int> keys = ServerMethods.lastUpdate.Keys.ToList();
-                
+
                 foreach ( int chat_id in keys )
-                    if ( ServerMethods.GetLastUpdateByChat(chat_id, true) != null )
-                        ServerMethods.sendMessage(chat_id, ServerMethods.GetLastUpdateByChat(chat_id).message.text + "\n<i>hi</i>\n<b><a href=amicidibembo.eu>MV</a></b>", ServerMethods.parse_mode.HTML);
+                    if ( ServerMethods.GetLastUpdateByChat(chat_id, true) != null ) {
+                        string messagetext = ServerMethods.GetLastUpdateByChat(chat_id).message.text;
+                        ServerMethods.sendMessage(chat_id, messagetext + "\n<b>MV</b>", ServerMethods.parse_mode.HTML);
+                        Chat chat = ServerMethods.getChat(chat_id).result;
+                        Console.WriteLine(string.Format("{0} ({1} {2}) wrote: {3} (in a {4} chat)", chat.username, chat.first_name, chat.last_name, messagetext, chat.type));
+                    }
                 Thread.Sleep(100);
             }
         }

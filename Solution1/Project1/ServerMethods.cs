@@ -8,7 +8,7 @@ using System.Net;
 using System.Web.Script.Serialization;
 
 namespace myTelegramBot {
-   public class ServerMethods {
+    public class ServerMethods {
 
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
         const string website = "https://api.telegram.org/bot"+token+"/";
@@ -97,14 +97,21 @@ namespace myTelegramBot {
             return sendMessage(argument);
         }
         static public string TextCleaner(ref string text) {
+            text.Replace("#", "");
             text = text.Replace("&", "");
-            text = text.Replace("\"", "&quot");
-            text = text.Replace("€", "&euro");
             return text;
         }
         static Message sendMessage(string argument) {
             string response = new WebClient().DownloadString(website + "sendMessage" + argument);
             return new JavaScriptSerializer().Deserialize<Message>(response);
+        }
+
+        static public getChat getChat(int chat_id){
+            if ( !lastUpdate.ContainsKey(chat_id) )
+                return null;
+            string argument = "?chat_id=" + chat_id;
+            string response = new WebClient().DownloadString(website + "getChat" + argument);
+            return new JavaScriptSerializer().Deserialize<getChat>(response);
         }
     }
 }

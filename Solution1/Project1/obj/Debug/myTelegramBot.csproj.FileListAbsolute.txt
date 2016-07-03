@@ -3,3 +3,4 @@ V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\bin\Debug\myTe
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\bin\Debug\myTelegramBot.pdb
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Debug\myTelegramBot.exe
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Debug\myTelegramBot.pdb
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Debug\myTelegramBot.csprojResolveAssemblyReference.cache

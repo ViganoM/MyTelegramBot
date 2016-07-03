@@ -1,1 +1,0 @@
-V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\myTelegraBotAPP\obj\Debug\myTelegraBotAPP.csprojResolveAssemblyReference.cache
