@@ -73,6 +73,7 @@ namespace Task {
                         else
                             queue.Dequeue();
                 Thread.Sleep(10);
+
             } while ( queue.Count > 0 || !finished );
             EndEvent.Set();
         }
@@ -87,6 +88,77 @@ namespace Task {
             for ( int n = 1 ; n <= number ; n++ )
                 factorial *= n;
             return factorial;
+        }
+
+        /*//other*/
+
+        public static void FindAnagram() {
+            string[] dictionary = File.ReadAllLines(myTelegramBot.Properties.Settings.Default.dictionaryPath).ToArray();
+            List<string[]> dictionaries = new List<string[]>();
+            List<Dictionary<char[], List<string>>> lookup = new List<Dictionary<char[], List<string>>>();
+            for ( int n = 0 ; n < 20 ; n++ ) {
+                dictionaries.Add(dictionary.Where(x => x.Length == n).ToArray());
+                lookup.Add(new Dictionary<char[], List<string>>(new CharComparer()));
+            }
+
+            for ( int n = 0 ; n < dictionaries.Count ; n++ ) {
+                foreach ( string word in dictionaries[n] ) {
+                    Console.WriteLine(word);
+                    char[] chars = word.ToCharArray();
+                    Array.Sort(chars);
+                    if ( lookup[n].ContainsKey(chars) )
+                        lookup[n][chars].Add(word);
+                    else
+                        lookup[n].Add(chars, new List<string>() { word });
+                }
+            }
+
+            foreach ( Dictionary<char[], List<string>> l in lookup ) {
+                List<char[]> indexes = new List<char[]>();
+                foreach ( char[] key in l.Keys )
+                    if ( l[key].Count < 2 )
+                        indexes.Add(key);
+                foreach ( char[] key in indexes )
+                    l.Remove(key);
+            }
+
+            StreamWriter writer = File.AppendText(myTelegramBot.Properties.Settings.Default.writerPath);
+
+            Console.Write("\n---------------------------------------------------------------------\n\n");
+            foreach ( Dictionary<char[], List<string>> l in lookup )
+                foreach ( char[] key in l.Keys ) {
+                    Console.Write("\n--------");
+                    writer.Write("\n---------");
+                    foreach ( char c in key ) {
+                        Console.Write(" " + c);
+                        writer.Write("\n---------");
+                    }
+                    Console.WriteLine("\n");
+                    writer.Write("\n\n");
+                    foreach ( string word in l[key] ) {
+                        Console.WriteLine(word);
+                        writer.Write(word+"\n");
+                    }
+                }
+        }
+
+        public class CharComparer : IEqualityComparer<char[]> {
+            public bool Equals(char[] x, char[] y) {
+                if ( x.Length != y.Length )
+                    return false;
+
+                Array.Sort(x);
+                Array.Sort(y);
+
+                for ( int n = 0 ; n < x.Length ; n++ )
+                    if ( x[n] != y[n] )
+                        return false;
+                return true;
+            }
+
+            public int GetHashCode(char[] obj) {
+                return new string(obj).GetHashCode();
+            }
         }
     }
 }

@@ -40,5 +40,14 @@ namespace myTelegramBot.Properties {
                 return ((int)(this["waitTime"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Downloads\\words.italian\\anagrams.txt")]
+        public string writerPath {
+            get {
+                return ((string)(this["writerPath"]));
+            }
+        }
     }
 }

@@ -13,11 +13,15 @@ namespace myTelegramBot {
 
 
         static void Main(string[] args) {
+
+            Task.Anagram.FindAnagram();
+            Console.ReadLine();
+            /*
             if ( ServerMethods.GetMe().ok )
                 Updater();
             else
                 Console.WriteLine("Telegram doesn't like you!\n(GetMe returned not ok)");
-
+                */
         }
 
         /*//use this to START the Updarer loop*/

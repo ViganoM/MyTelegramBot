@@ -20,3 +20,5 @@ V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\bin\Debug\
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\obj\Debug\WebApp.Tests.csprojResolveAssemblyReference.cache
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\obj\Debug\WebApp.Tests.dll
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\obj\Debug\WebApp.Tests.pdb
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\bin\Debug\myTelegramBot.exe
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\WebApp.Tests\bin\Debug\myTelegramBot.pdb
