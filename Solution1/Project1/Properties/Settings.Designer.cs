@@ -25,15 +25,6 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Downloads\\words.italian\\words.italian.txt")]
-        public string dictionaryPath {
-            get {
-                return ((string)(this["dictionaryPath"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int waitTime {
             get {
@@ -43,10 +34,9 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Downloads\\words.italian\\anagrams.txt")]
-        public string writerPath {
+        public global::System.Collections.Generic.List<myTelegramBot.Userdata> localData {
             get {
-                return ((string)(this["writerPath"]));
+                return ((global::System.Collections.Generic.List<myTelegramBot.Userdata>)(this["localData"]));
             }
         }
     }

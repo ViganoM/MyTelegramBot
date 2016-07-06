@@ -45,7 +45,8 @@ namespace myTelegramBot {
                 if ( UpdateList[n].message.chat.id != chat_id )
                     UpdateList.RemoveAt(n);
             if ( UpdateList.Count > 1 )
-                throw new Exception("too many Update objects returning in GetLastUpdateByChat method");
+                System.Windows.Forms.MessageBox.Show("too many Update objects returning in GetLastUpdateByChat method");
+            //throw new Exception("too many Update objects returning in GetLastUpdateByChat method");
             if ( UpdateList.Count == 0 )
                 return null;
             return UpdateList[UpdateList.Count - 1];
@@ -95,6 +96,24 @@ namespace myTelegramBot {
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
+        }
+        static public List<Message> sendBroadMessage(string text) {
+            List<Message> messagges = new List<Message>();
+            TextCleaner(ref text);
+            foreach ( Userdata userdata in localUsersData.usersData ) {
+                string argument = string.Format("?chat_id={0}&text={1}", userdata.chat.id, text);
+                messagges.Add(sendMessage(argument));
+            }
+            return messagges;
+        }
+        static public List<Message> sendBroadMessage(string text, parse_mode parse_mode) {
+            List<Message> messagges = new List<Message>();
+            TextCleaner(ref text);
+            foreach ( Userdata userdata in localUsersData.usersData ) {
+                string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}", userdata.chat.id, text, parse_mode);
+                messagges.Add(sendMessage(argument));
+            }
+            return messagges;
         }
         static public string TextCleaner(ref string text) {
             text.Replace("#", "");
