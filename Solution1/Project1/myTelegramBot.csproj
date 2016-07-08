@@ -74,7 +74,7 @@
     <None Include="App.config" />
     <None Include="myTelegramBotSign.pfx" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>

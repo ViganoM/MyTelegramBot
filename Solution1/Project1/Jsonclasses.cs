@@ -34,6 +34,7 @@ namespace JsonTypes {
         public string first_name { get; set; }
         public string username { get; set; }
     }
+    [Serializable]
     public class Chat {
         public int id { get; set; }
         public string type { get; set; }
@@ -41,6 +42,7 @@ namespace JsonTypes {
         public string username { get; set; }
         public string first_name { get; set; }
         public string last_name { get; set; }
+        public Chat() { }
     }
     public class Message {
         public int message_id { get; set; }
@@ -76,6 +78,7 @@ namespace JsonTypes {
         public Int64 migrate_from_chat_id { get; set; }
         public Message pinned_message { get; set; }
     }
+    public enum MessageEntityTypes { mention, hashtag, bot_command, url, email, bold, italic, code, pre, text_link, text_mention }
     public class MessageEntity {
         public string type { get; set; }
         public int offset { get; set; }

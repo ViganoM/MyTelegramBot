@@ -13,7 +13,7 @@ namespace myTelegramBot.Properties {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
@@ -25,18 +25,32 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public int waitTime {
             get {
                 return ((int)(this["waitTime"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<myTelegramBot.Userdata> localData {
+        public global::myTelegramBot.LocalUsers localData {
             get {
-                return ((global::System.Collections.Generic.List<myTelegramBot.Userdata>)(this["localData"]));
+                return ((global::myTelegramBot.LocalUsers)(this["localData"]));
+            }
+            set {
+                this["localData"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<int> setting {
+            get {
+                return ((global::System.Collections.Generic.List<int>)(this["setting"]));
+            }
+            set {
+                this["setting"] = value;
             }
         }
     }
