@@ -45,12 +45,6 @@ namespace myTelegramBot {
             }
             return true;
         }
-        public static void ShowData() {
-            string show = "";
-            foreach ( int chat_id in usersData.Keys )
-                show += chat_id.ToString() + "\n";
-            MessageBox.Show(show);
-        }
     }
 
     [Serializable]

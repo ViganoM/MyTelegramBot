@@ -25,11 +25,16 @@ namespace myTelegramBot {
                 }
             }
         }
-        public List<Userdata> users {
-            set {
-                foreach ( Userdata userdata in value ) {
-                    imageList_users.Images.Add(userdata.chat.id.ToString(), userdata.photo);
-                    listView_users.Items.Add(new ListViewItem(new string[7] {
+
+        public void SetUsers(Userdata userData) {
+                List<Userdata> list = new List<Userdata>();
+            list.Add(userData);
+            SetUsers(list);
+        }
+        public void SetUsers(List<Userdata> userList) {
+            foreach ( Userdata userdata in userList ) {
+                imageList_users.Images.Add(userdata.chat.id.ToString(), userdata.photo);
+                listView_users.Items.Add(new ListViewItem(new string[7] {
                         userdata.chat.id.ToString(),
                         userdata.chat.username,
                         userdata.chat.first_name,
@@ -38,14 +43,14 @@ namespace myTelegramBot {
                         userdata.active.ToString(),
                         userdata.speed.ToString()
                     }, imageKey: userdata.chat.id.ToString()));
-                }
             }
         }
 
-        void WriteToConsole(string text, Color color) {
-
+        public void WriteToConsole(string text, Color color) {
+            //TODO console
+            throw new NotImplementedException();
         }
-        void WriteToConsole(string text) {
+        public void WriteToConsole(string text) {
             WriteToConsole(text, SystemColors.ControlText);
         }
     }

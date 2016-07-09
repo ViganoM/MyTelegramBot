@@ -40,6 +40,7 @@ namespace JsonTypes {
         public CallbackQuery callback_query { get; set; }
         */
     }
+    [Serializable]
     public class User {
         public int id { get; set; }
         public string first_name { get; set; }

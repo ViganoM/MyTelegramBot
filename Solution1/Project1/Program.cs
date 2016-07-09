@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using JsonTypes;
 using System.Windows.Forms;
 using myTelegramBot.Properties;
 
@@ -26,8 +24,8 @@ namespace myTelegramBot {
             if ( ServerMethods.GetMe().ok ) {
                 Console.WriteLine("fully operational");
                 new Thread(Updater).Start();
-                form.users = localUsersData.usersData.Values.ToList();
-                ServerMethods.sendBroadMessage("I am back on\n<b>MV</b>", ServerMethods.parse_mode.HTML);
+                form.SetUsers(localUsersData.usersData.Values.ToList());
+                ServerMethods.sendBroadMessage("I am back on\n<b>MV</b>",false);
             } else
                 Console.WriteLine("Telegram doesn't like you!\n(GetMe returned not ok)");
         }
@@ -40,7 +38,7 @@ namespace myTelegramBot {
             }
         }
         public static void Close(object sender, FormClosingEventArgs e) {
-            ServerMethods.sendBroadMessage("I will be off for a while\n<b>MV</b>", ServerMethods.parse_mode.HTML);
+            ServerMethods.sendBroadMessage("I will be off for a while\n<b>MV</b>", false);
             localUsersData.SaveData();
             Environment.Exit(0);
         }

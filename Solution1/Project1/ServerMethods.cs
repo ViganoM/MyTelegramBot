@@ -23,6 +23,7 @@ namespace myTelegramBot {
         static int lastUpdate=0;
         static Dictionary<int, Userdata> usersData = localUsersData.usersData;
 
+        /*GetUpdates
         static public getUpdates GetUpdates(int limit = 100) {
             string argument = string.Format("?limit={0}", limit);
             return GetUpdates(argument);
@@ -31,6 +32,7 @@ namespace myTelegramBot {
             string argument = string.Format("?offset={0}&limit={1}", offset, limit);
             return GetUpdates(argument);
         }
+        */
         static public getUpdates GetUnreadUpdates(int limit = 100) {
             string argument = string.Format("?offset={0}&limit={1}", lastUpdate + 1, limit);
             return GetUpdates(argument);
@@ -75,52 +77,23 @@ namespace myTelegramBot {
             return new JavaScriptSerializer().Deserialize<getMe>(response);
         }
 
-        static public Message sendMessage(int chat_id, string text, int reply_to_message_id = -1) {
+        static public Message sendMessage(int chat_id, string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML, int reply_to_message_id = -1) {
             TextCleaner(ref text);
-            string argument = string.Format("?chat_id={0}&text= {1}", chat_id, text);
+            string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
             return sendMessage(argument);
         }
-        static public Message sendMessage(int chat_id, string text, parse_mode parse_mode, int reply_to_message_id = -1) {
-            TextCleaner(ref text);
-            string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}", chat_id, text, parse_mode);
-            if ( reply_to_message_id != -1 )
-                argument += "&reply_to_message_id=" + reply_to_message_id;
-            return sendMessage(argument);
-        }
-        static public Message sendMessage(int chat_id, string text, bool disable_notification, int reply_to_message_id = -1) {
-            TextCleaner(ref text);
-            string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}", chat_id, text, disable_notification);
-            if ( reply_to_message_id != -1 )
-                argument += "&reply_to_message_id=" + reply_to_message_id;
-            return sendMessage(argument);
-        }
-        static public Message sendMessage(int chat_id, string text, parse_mode parse_mode, bool disable_notification, int reply_to_message_id = -1) {
-            TextCleaner(ref text);
-            string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}&disable_notification={3}", chat_id, text, parse_mode, disable_notification);
-            if ( reply_to_message_id != -1 )
-                argument += "&reply_to_message_id=" + reply_to_message_id;
-            return sendMessage(argument);
-        }
-        static public List<Message> sendBroadMessage(string text) {
+        static public List<Message> sendBroadMessage(string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML) {
             List<Message> messagges = new List<Message>();
             TextCleaner(ref text);
             foreach ( int chat_id in usersData.Keys ) {
-                string argument = string.Format("?chat_id={0}&text={1}", chat_id, text);
+                string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
                 messagges.Add(sendMessage(argument));
             }
             return messagges;
         }
-        static public List<Message> sendBroadMessage(string text, parse_mode parse_mode) {
-            List<Message> messagges = new List<Message>();
-            TextCleaner(ref text);
-            foreach ( int chat_id in usersData.Keys ) {
-                string argument = string.Format("?chat_id={0}&text={1}&parse_mode={2}", chat_id, text, parse_mode);
-                messagges.Add(sendMessage(argument));
-            }
-            return messagges;
-        }
+
         static public string TextCleaner(ref string text) {
             text.Replace("#", "");
             text = text.Replace("&", "");
@@ -140,7 +113,7 @@ namespace myTelegramBot {
         public static Bitmap getUserPhoto(int user_id) {
             PhotoSize photo = new PhotoSize();
             List<List<PhotoSize>> photoListList = getUserProfilePhotos(user_id).photos;
-            if ( photoListList == null || photoListList.Count==0 )
+            if ( photoListList == null || photoListList.Count == 0 )
                 return new Bitmap(Resources.MyIcon.ToBitmap());
 
             foreach ( PhotoSize p in photoListList.Last() )
@@ -169,8 +142,6 @@ namespace myTelegramBot {
             return path;
         }
 
-        //STUFF
-
         static public void ParseMessage(Message message) {
             if ( message.entities == null || message.entities.Count == 0 )
                 return;
@@ -181,7 +152,7 @@ namespace myTelegramBot {
                     if ( !foundOne )
                         foundOne = true;
                     else {
-                        sendMessage(message.chat.id, "I'm not so clever to handle multiple commands\nUse one by time, please", message.message_id);
+                        sendMessage(message.chat.id, "I'm not so clever to handle multiple commands\nUse one by time, please", reply_to_message_id: message.message_id);
                         return;
                     }
 
