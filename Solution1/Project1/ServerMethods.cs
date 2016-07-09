@@ -6,13 +6,17 @@ using JsonTypes;
 using System.Web;
 using System.Net;
 using System.Web.Script.Serialization;
+using myTelegramBot.Properties;
+using System.Drawing;
+using System.Linq;
 
 namespace myTelegramBot {
     public class ServerMethods {
 
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
         const string website = "https://api.telegram.org/bot"+token+"/";
-        
+        const string fileWebsite = "https://api.telegram.org/file/bot" + token+"/";
+
         public enum parse_mode { Markdown, HTML }
         static List<string> restart_phrases = new List<string>() {"I was just waiting this", "I couldn't wait anymore!", "Got it...\nGet ready.." };
         static List<string> HTMLstyle = new List<string>()  { "b", "strong", "i", "em", "a", "code", "pre" };
@@ -28,7 +32,7 @@ namespace myTelegramBot {
             return GetUpdates(argument);
         }
         static public getUpdates GetUnreadUpdates(int limit = 100) {
-            string argument = string.Format("?offset={0}&limit={1}", lastUpdate+1, limit);
+            string argument = string.Format("?offset={0}&limit={1}", lastUpdate + 1, limit);
             return GetUpdates(argument);
         }
         static public getUpdates GetUpdatesByChat(int chat_id, int limit = 100) {
@@ -40,7 +44,7 @@ namespace myTelegramBot {
             return getUpdate;
         }
         static public getUpdates GetUnreadUpdatesByChat(int chat_id, int limit = 100) {
-            string argument = string.Format("?offset={0}&limit={1}", usersData[chat_id].lastUpdate+1, limit);
+            string argument = string.Format("?offset={0}&limit={1}", usersData[chat_id].lastUpdate + 1, limit);
             getUpdates getUpdates = GetUpdates(argument);
             for ( int n = getUpdates.result.Count - 1 ; n >= 0 ; n-- )
                 if ( getUpdates.result[n].message.chat.id != chat_id )
@@ -50,11 +54,11 @@ namespace myTelegramBot {
         static getUpdates GetUpdates(string argument) {
             string response = new WebClient().DownloadString(website + "getUpdates" + argument);
             getUpdates getUpdates = new JavaScriptSerializer().Deserialize<getUpdates>(response);
-            
+
             for ( int n = 0 ; n < getUpdates.result.Count ; n++ ) {
                 Update update = getUpdates.result[n];
                 //eventually add to localUsers FIRST
-                localUsersData.AddUser(update.message.chat);
+                localUsersData.AddUser(update.message.chat, update.message.from);
                 //parse the message to check if contains commands
                 ParseMessage(update.message);
                 //update lastUpdate
@@ -131,6 +135,38 @@ namespace myTelegramBot {
             string argument = "?chat_id=" + chat_id;
             string response = new WebClient().DownloadString(website + "getChat" + argument);
             return new JavaScriptSerializer().Deserialize<getChat>(response);
+        }
+
+        public static Bitmap getUserPhoto(int user_id) {
+            PhotoSize photo = new PhotoSize();
+            List<List<PhotoSize>> photoListList = getUserProfilePhotos(user_id).photos;
+            if ( photoListList == null || photoListList.Count==0 )
+                return new Bitmap(Resources.MyIcon.ToBitmap());
+
+            foreach ( PhotoSize p in photoListList.Last() )
+                if ( photo.height < p.height )
+                    photo = p;
+
+            return new Bitmap(DownloadFile(getFile(photo.file_id).file_path));
+        }
+
+        static UserProfilePhotos getUserProfilePhotos(int user_id, int offset = 0, int limit = 100) {
+            string argument = string.Format("?user_id={0}&offset={1}&limit={2}", user_id, offset, limit);
+            string response = new WebClient().DownloadString(website + "getUserProfilePhotos" + argument);
+            return new JavaScriptSerializer().Deserialize<UserProfilePhotos>(response);
+        }
+        static File getFile(string file_id) {
+            string response = new WebClient().DownloadString(website + "getFile" + "?file_id=" + file_id);
+            return new JavaScriptSerializer().Deserialize<File>(response);
+        }
+        static string DownloadFile(string file_path) {
+            string path = Settings.Default.PhotoPath + file_path;
+            int n = 0;
+            while ( System.IO.File.Exists(path) )
+                path += string.Format(" {0}", n++);
+
+            new WebClient().DownloadFile(fileWebsite + file_path, path);
+            return path;
         }
 
         //STUFF

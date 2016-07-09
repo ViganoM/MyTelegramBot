@@ -34,23 +34,31 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::myTelegramBot.LocalUsers localData {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int lastUpdate {
             get {
-                return ((global::myTelegramBot.LocalUsers)(this["localData"]));
+                return ((int)(this["lastUpdate"]));
             }
             set {
-                this["localData"] = value;
+                this["lastUpdate"] = value;
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<int> setting {
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\data")]
+        public string DataPath {
             get {
-                return ((global::System.Collections.Generic.List<int>)(this["setting"]));
+                return ((string)(this["DataPath"]));
             }
-            set {
-                this["setting"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\")]
+        public string PhotoPath {
+            get {
+                return ((string)(this["PhotoPath"]));
             }
         }
     }

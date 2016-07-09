@@ -17,6 +17,17 @@ namespace JsonTypes {
         public bool ok { get; set; }
         public Chat result { get; set; }
     }
+    //UserProfilePhotos
+    public class UserProfilePhotos {
+        public int total_count { get; set; }
+        public List<List<PhotoSize>> photos { get; set; }
+    }
+    //File
+    public class File {
+        public string file_id { get; set; }
+        public int file_size { get; set; }
+        public string file_path { get; set; }
+    }
 
     //STUFF
     public class Update {
@@ -42,7 +53,6 @@ namespace JsonTypes {
         public string username { get; set; }
         public string first_name { get; set; }
         public string last_name { get; set; }
-        public Chat() { }
     }
     public class Message {
         public int message_id { get; set; }
@@ -145,9 +155,5 @@ namespace JsonTypes {
         public string title { get; set; }
         public string address { get; set; }
         public string foursquare_id { get; set; }
-    }
-    public class UserProfilePhotos {
-        public int total_count { get; set; }
-        public List<List<PhotoSize>> photos { get; set; }
     }
 }
