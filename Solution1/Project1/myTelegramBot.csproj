@@ -36,7 +36,8 @@
     <StartupObject>myTelegramBot.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Artistic.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -91,7 +92,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Artistic.ico" />
     <None Include="Resources\Artistic.ico" />
     <None Include="Resources\MyIcon.bmp" />
   </ItemGroup>

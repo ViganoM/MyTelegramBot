@@ -15,7 +15,7 @@ namespace WebApp {
 
         private void RunButton_Click(object sender, EventArgs e){
             if ( runButton.Text == "run" ) {
-                Program.Updater();
+                //Program.Updater();
                 runButton.Text = "stop";
             } else
                 Program.run = false;

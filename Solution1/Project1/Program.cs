@@ -3,51 +3,66 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using myTelegramBot.Properties;
+using System.Diagnostics;
 
 namespace myTelegramBot {
     public class Program {
         /*//use this to STOP Updater loop*/
         public static bool run { private get; set; } = true;
 
-        static Form form = new Form();
-        static Thread formThread = new Thread(RunForm);
+        public static Form form;
+        static AutoResetEvent formCreated = new AutoResetEvent(false);
 
-        static void Main(string[] args) {
+        public static void Main(string[] args) {
+            #region Run Form
+            Thread formThread = new Thread(RunForm);
             formThread.Name = "Form Thread";
-            formThread.Start(form as object);
+            formThread.Start();
+            formCreated.WaitOne();
+            formCreated = null; //this is not supposed to be used anymore
+            form.WaitingTime = Settings.Default.waitTime;
+            #endregion
 
             if ( localUsersData.LoadData() )
-                Console.WriteLine("local data restored!");
+                form.WriteToConsole("Local data restored from ", System.Drawing.Color.Green);
             else
-                Console.WriteLine("local data NOT RESTORED, you idiot!");
+                form.WriteToConsole("Local data NOT RESTORED, you idiot!", System.Drawing.Color.Red);
 
             if ( ServerMethods.GetMe().ok ) {
-                Console.WriteLine("fully operational");
+                form.WriteToConsole("fully operational", System.Drawing.Color.Green);
                 new Thread(Updater).Start();
-                form.SetUsers(localUsersData.usersData.Values.ToList());
-                ServerMethods.sendBroadMessage("I am back on\n<b>MV</b>",false);
+                if ( localUsersData.usersData.Count > 0 )
+                    form.SetUsers(localUsersData.usersData.Values.ToList());
+                form.Loading = false;
+                ServerMethods.sendBroadMessage("I am back on\n<b>MV</b>", true);
             } else
-                Console.WriteLine("Telegram doesn't like you!\n(GetMe returned not ok)");
+                form.WriteToConsole("Telegram doesn't like you!\n(GetMe returned not ok)", System.Drawing.Color.Red);
+
         }
 
-        static void RunForm(object form) {
+        static void RunForm() {
+            form = new Form(formCreated);
             try {
-                Application.Run(form as Form);
+                Application.Run(form);
             } catch ( Exception exception ) {
-                MessageBox.Show("Form thread could not start\n" + exception.ToString(), "Form cannot start", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Form thread could not start\n" + exception.ToString(), "Form cannot start", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            //code after Application.Run is not executed!
         }
         public static void Close(object sender, FormClosingEventArgs e) {
-            ServerMethods.sendBroadMessage("I will be off for a while\n<b>MV</b>", false);
+            ServerMethods.sendBroadMessage("I will be off for a while\n<b>MV</b>", true);
             localUsersData.SaveData();
             Environment.Exit(0);
         }
 
         /*//use this to START the Updarer loop*/
         static void Updater() {
+            Stopwatch chrono = new Stopwatch();
             while ( run ) {
                 form.Working = true;
+                chrono.Restart();
                 ServerMethods.GetUnreadUpdates();
+                form.WorkingTime = chrono.ElapsedMilliseconds;
                 form.Working = false;
                 Thread.Sleep(Settings.Default.waitTime);
             }

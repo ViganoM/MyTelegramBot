@@ -25,7 +25,7 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
         public int waitTime {
             get {
                 return ((int)(this["waitTime"]));
@@ -46,7 +46,7 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\data")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\")]
         public string DataPath {
             get {
                 return ((string)(this["DataPath"]));
@@ -59,6 +59,36 @@ namespace myTelegramBot.Properties {
         public string PhotoPath {
             get {
                 return ((string)(this["PhotoPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("_yyyy.MM.dd..HH:mm.ss")]
+        public string datetimeFormat {
+            get {
+                return ((string)(this["datetimeFormat"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("data")]
+        public string DataFileName {
+            get {
+                return ((string)(this["DataFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastDataFileName {
+            get {
+                return ((string)(this["lastDataFileName"]));
+            }
+            set {
+                this["lastDataFileName"] = value;
             }
         }
     }

@@ -20,8 +20,7 @@ namespace myTelegramBot {
         public enum parse_mode { Markdown, HTML }
         static List<string> restart_phrases = new List<string>() {"I was just waiting this", "I couldn't wait anymore!", "Got it...\nGet ready.." };
         static List<string> HTMLstyle = new List<string>()  { "b", "strong", "i", "em", "a", "code", "pre" };
-        static int lastUpdate=0;
-        static Dictionary<int, Userdata> usersData = localUsersData.usersData;
+        public static int lastUpdate = 0;
 
         /*GetUpdates
         static public getUpdates GetUpdates(int limit = 100) {
@@ -46,7 +45,7 @@ namespace myTelegramBot {
             return getUpdate;
         }
         static public getUpdates GetUnreadUpdatesByChat(int chat_id, int limit = 100) {
-            string argument = string.Format("?offset={0}&limit={1}", usersData[chat_id].lastUpdate + 1, limit);
+            string argument = string.Format("?offset={0}&limit={1}", localUsersData.usersData[chat_id].lastUpdate + 1, limit);
             getUpdates getUpdates = GetUpdates(argument);
             for ( int n = getUpdates.result.Count - 1 ; n >= 0 ; n-- )
                 if ( getUpdates.result[n].message.chat.id != chat_id )
@@ -64,8 +63,8 @@ namespace myTelegramBot {
                 //parse the message to check if contains commands
                 ParseMessage(update.message);
                 //update lastUpdate
-                if ( update.update_id > usersData[update.message.chat.id].lastUpdate )
-                    usersData[update.message.chat.id].lastUpdate = update.update_id;
+                if ( update.update_id > localUsersData.usersData[update.message.chat.id].lastUpdate )
+                    localUsersData.usersData[update.message.chat.id].lastUpdate = update.update_id;
                 if ( update.update_id > lastUpdate )
                     lastUpdate = update.update_id;
             }
@@ -82,18 +81,18 @@ namespace myTelegramBot {
             string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
+            Program.form.WriteToConsole("Message sent to " + chat_id + ":\n" + text,Color.Blue);
             return sendMessage(argument);
         }
         static public List<Message> sendBroadMessage(string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML) {
             List<Message> messagges = new List<Message>();
             TextCleaner(ref text);
-            foreach ( int chat_id in usersData.Keys ) {
+            foreach ( int chat_id in localUsersData.usersData.Keys ) {
                 string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
                 messagges.Add(sendMessage(argument));
             }
             return messagges;
         }
-
         static public string TextCleaner(ref string text) {
             text.Replace("#", "");
             text = text.Replace("&", "");
@@ -164,19 +163,19 @@ namespace myTelegramBot {
                     sendMessage(message.chat.id, "REMEMBER THIS BOT IS STILL IN DEVELOPMENT AND IS NOT WORKING BY NOW\nIf you keep this chat YOU WILL ME NOTIFIED AS SOON AS READY\n\nYou will receive a message at random times. Write something back as soon as you can!");
                     break;
                 case "/faster":
-                    usersData[message.chat.id].speed += 1;
-                    sendMessage(message.chat.id, "Speed is now set to " + usersData[message.chat.id].speed + " of 5");
+                    localUsersData.usersData[message.chat.id].speed += 1;
+                    sendMessage(message.chat.id, "Speed is now set to " + localUsersData.usersData[message.chat.id].speed + " of 5");
                     break;
                 case "/slower":
-                    usersData[message.chat.id].speed -= 1;
-                    sendMessage(message.chat.id, "Speed is now set to " + usersData[message.chat.id].speed + " of 5");
+                    localUsersData.usersData[message.chat.id].speed -= 1;
+                    sendMessage(message.chat.id, "Speed is now set to " + localUsersData.usersData[message.chat.id].speed + " of 5");
                     break;
                 case "/pause":
-                    usersData[message.chat.id].active = false;
+                    localUsersData.usersData[message.chat.id].active = false;
                     sendMessage(message.chat.id, "I will take a break...", true);
                     break;
                 case "/write":
-                    usersData[message.chat.id].active = true;
+                    localUsersData.usersData[message.chat.id].active = true;
                     sendMessage(message.chat.id, restart_phrases[new Random().Next(0, restart_phrases.Count)]);
                     break;
             }

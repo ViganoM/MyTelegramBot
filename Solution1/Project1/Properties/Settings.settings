@@ -3,16 +3,25 @@
   <Profiles />
   <Settings>
     <Setting Name="waitTime" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">50</Value>
+      <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="lastUpdate" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="DataPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\data</Value>
+      <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\</Value>
     </Setting>
     <Setting Name="PhotoPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\</Value>
+    </Setting>
+    <Setting Name="datetimeFormat" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">_yyyy.MM.dd..HH:mm.ss</Value>
+    </Setting>
+    <Setting Name="DataFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">data</Value>
+    </Setting>
+    <Setting Name="lastDataFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
