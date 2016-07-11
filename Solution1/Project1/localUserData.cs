@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using System.Timers;
+using System.Windows.Forms;
 using JsonTypes;
 using myTelegramBot.Properties;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.Serialization;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Threading;
-using System.Diagnostics;
-using System.Security.Permissions;
 
 
 namespace myTelegramBot {
+    public enum activity { WaitingSend, WaitingResponse, Inactive }
     static class localUsersData {
         static string now {
             get { return DateTime.Now.ToString(Settings.Default.datetimeFormat); }
@@ -98,6 +94,9 @@ namespace myTelegramBot {
                 lock ( lockSaving )
                     usersData = new BinaryFormatter().Deserialize(new FileStream(LoadPath, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
                 Program.form.WriteToConsole("Settings succesfully restored from " + LoadPath, Color.Green);
+                foreach ( Userdata userdata in usersData.Values )
+                    userdata.timer = new System.Timers.Timer();
+
                 return true;
             } catch ( FileNotFoundException fileNotFound ) {
                 Program.form.WriteToConsole("Settings file not found", Color.Red);
@@ -109,7 +108,7 @@ namespace myTelegramBot {
                 MessageBox.Show("Settings not restored\n" + exception.ToString(), "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-        }
+        }   //TODO load last saving if failsS
     }
 
     [Serializable]
@@ -118,9 +117,10 @@ namespace myTelegramBot {
         public User user { get; private set; }
         public Bitmap photo { get; private set; }
         public readonly DateTime joinDate;
-        public DateTime lastSave = new DateTime(0);
+        public List<TimeSpan> response { get; private set; }
+        //public DateTime lastSave = new DateTime(0);
 
-        public int lastUpdate = 0;
+        public int lastUpdate { get; private set; } = 0;
         int _speed = 3;
         public int speed {
             get { return _speed; }
@@ -130,20 +130,93 @@ namespace myTelegramBot {
                 Program.form.SetUser(this);
             }
         }
-        bool _active =true;
-        public bool active {
-            get { return _active; }
+        activity _activity = activity.WaitingSend;
+        public activity activity {
+            get { return _activity; }
             set {
-                _active = value;
+                _activity = value;
+                if ( activity == activity.Inactive )
+                    timer.Stop();
+                else if ( activity == activity.WaitingSend )
+                    Next();
+
                 Program.form.SetUser(this);
             }
         }
+        public bool notificate=true;
+
+        [NonSerialized]
+        public System.Timers.Timer timer = new System.Timers.Timer();   //HACK this should not be public. Timer must be set in this class once
+        //DateTime nextMessageSent; 
+        //TODO add to form nextmessagesent
+        DateTime lastMessageSent;
+
 
         public Userdata(Chat chatItem, User userItem) {
             chat = chatItem;
             user = userItem;
             photo = ServerMethods.getUserPhoto(user.id);
             joinDate = DateTime.Now;
+            timer.Elapsed += new ElapsedEventHandler(Send);
+        }
+
+        public void MessageInput(Update update) {
+            lastUpdate = update.message.message_id;
+            if ( activity == activity.WaitingResponse ) {
+                activity = activity.WaitingSend;
+                TimeSpan delta = DateTime.Now - lastMessageSent;
+                response.Add(delta);
+                //                string time = "";
+                /* d
+                if ( delta.TotalSeconds < 1 )
+                    time = delta.ToString("s\\.fff") + "seconds";
+                else if ( delta.TotalSeconds < 60 )
+                    if ( delta.TotalSeconds == 1 )
+                        time = "exaclty 1 second!";
+                    else
+                        time = delta.TotalSeconds.ToString() + delta.ToString("\\.fff") + "seconds";
+                else if ( delta.TotalMinutes < 60 )
+                    if ( delta.TotalMinutes == 1 )
+                        time = "exaclty 1 minute!";
+                    else
+                        time = delta.TotalMinutes.ToString() + delta.ToString("\\m\\i\\n\\ \\a\\n\\d\\ ss\\.fff") + "seconds"
+                        */
+                ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds + " seconds.");
+            } else if ( activity == activity.WaitingSend )
+ServerMethods.sendMessage(chat.id, "What do you mean?\nUse commands or wait my next message", false, update.message.message_id);
+            else if (activity == activity.Inactive)
+                ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges", false);
+
+        }
+        public void Next() {
+            if ( activity == activity.WaitingSend ) {
+                double addSeconds = 0;
+                Random random = new Random();
+                switch ( _speed ) {
+                    case 1:
+                        addSeconds = (random.Next(25, 51) + random.NextDouble()) * 3600;
+                        break;
+                    case 2:
+                        addSeconds = (random.Next(20, 41) + random.NextDouble()) * 3600;
+                        break;
+                    case 3:
+                        addSeconds = (random.Next(15, 31) + random.NextDouble()) * 3600;
+                        break;
+                    case 4:
+                        addSeconds = (random.Next(10, 21) + random.NextDouble()) * 3600;
+                        break;
+                    case 5:
+                        addSeconds = (random.Next(5, 11) + random.NextDouble()) * 3600;
+                        break;
+                }
+                timer.Interval = addSeconds;
+                timer.Start();
+            }
+        }
+        void Send(object sender, ElapsedEventArgs e) {
+            ServerMethods.sendMessage(chat.id, "Answer this!\nSent:" + DateTime.Now.ToShortTimeString(), !notificate);
+            lastMessageSent = DateTime.Now;
+            activity = activity.WaitingResponse;
         }
     }
 }

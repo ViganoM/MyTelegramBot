@@ -61,10 +61,10 @@ namespace myTelegramBot {
                 //eventually add to localUsers FIRST
                 localUsersData.AddUser(update.message.chat, update.message.from);
                 //parse the message to check if contains commands
-                ParseMessage(update.message);
-                //update lastUpdate
-                if ( update.update_id > localUsersData.usersData[update.message.chat.id].lastUpdate )
-                    localUsersData.usersData[update.message.chat.id].lastUpdate = update.update_id;
+                if (! ParseMessage(update.message) )
+                //give info to userdata of sender
+                localUsersData.usersData[update.message.chat.id].MessageInput(update);
+                //update ServerMethods.lastUpdate
                 if ( update.update_id > lastUpdate )
                     lastUpdate = update.update_id;
             }
@@ -76,12 +76,12 @@ namespace myTelegramBot {
             return new JavaScriptSerializer().Deserialize<getMe>(response);
         }
 
-        static public Message sendMessage(int chat_id, string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML, int reply_to_message_id = -1) {
+        static public Message sendMessage(int chat_id, string text, bool disable_notification = false, int reply_to_message_id = -1, parse_mode parse_mode = parse_mode.HTML) {
             TextCleaner(ref text);
             string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
-            Program.form.WriteToConsole("Message sent to " + chat_id + ":\n" + text,Color.Blue);
+            Program.form.WriteToConsole("Message sent",Color.Blue);
             return sendMessage(argument);
         }
         static public List<Message> sendBroadMessage(string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML) {
@@ -91,6 +91,8 @@ namespace myTelegramBot {
                 string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
                 messagges.Add(sendMessage(argument));
             }
+            Program.form.WriteToConsole("Broadcast message sent", Color.Blue);
+
             return messagges;
         }
         static public string TextCleaner(ref string text) {
@@ -141,9 +143,9 @@ namespace myTelegramBot {
             return path;
         }
 
-        static public void ParseMessage(Message message) {
+        static public bool ParseMessage(Message message) {
             if ( message.entities == null || message.entities.Count == 0 )
-                return;
+               return false;
 
             bool foundOne = false;
             foreach ( MessageEntity entity in message.entities )
@@ -152,7 +154,7 @@ namespace myTelegramBot {
                         foundOne = true;
                     else {
                         sendMessage(message.chat.id, "I'm not so clever to handle multiple commands\nUse one by time, please", reply_to_message_id: message.message_id);
-                        return;
+                        return false;
                     }
 
             string command = message.text.Substring(message.entities[0].offset, message.entities[0].length);
@@ -171,14 +173,22 @@ namespace myTelegramBot {
                     sendMessage(message.chat.id, "Speed is now set to " + localUsersData.usersData[message.chat.id].speed + " of 5");
                     break;
                 case "/pause":
-                    localUsersData.usersData[message.chat.id].active = false;
-                    sendMessage(message.chat.id, "I will take a break...", true);
+                    localUsersData.usersData[message.chat.id].activity = activity.Inactive;
+                    sendMessage(message.chat.id, "I will take a break...\nYou will no longer receive messages until you enter the command /write", true);
                     break;
                 case "/write":
-                    localUsersData.usersData[message.chat.id].active = true;
-                    sendMessage(message.chat.id, restart_phrases[new Random().Next(0, restart_phrases.Count)]);
+                    localUsersData.usersData[message.chat.id].activity = activity.WaitingSend;
+                    sendMessage(message.chat.id, restart_phrases[new Random().Next(0, restart_phrases.Count)]+"\nSpeed is "+localUsersData.usersData[message.chat.id].speed);
+                    break;
+                case "/notificate":
+                    localUsersData.usersData[message.chat.id].notificate = !localUsersData.usersData[message.chat.id].notificate;
+                    if ( localUsersData.usersData[message.chat.id].notificate )
+                        sendMessage(message.chat.id, "Notifications are now active");
+                    else
+                        sendMessage(message.chat.id, "Notifications are now disabled. Be carefull!");
                     break;
             }
+            return true;
         }
     }
 }

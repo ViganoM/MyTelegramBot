@@ -52,9 +52,10 @@ namespace myTelegramBot {
 
         public void SetUser(Userdata userData) {
             if ( listView_users.Items.ContainsKey(userData.chat.id.ToString()) )
-                listView_users.Items.RemoveByKey(userData.chat.id.ToString());
+                RemoveUser(userData);
             List<Userdata> list = new List<Userdata>() { userData };
             SetUsers(list);
+            WriteToConsole("user " + userData.user.username + " UPDATED", Color.DarkViolet);
         }
         public void SetUsers(List<Userdata> userList, bool clear = false) {
             if ( clear ) {
@@ -69,7 +70,7 @@ namespace myTelegramBot {
                         userdata.chat.first_name,
                         userdata.chat.last_name,
                         userdata.joinDate.ToString("dd MMM yy"),
-                        userdata.active.ToString(),
+                        userdata.activity.ToString(),
                         userdata.speed.ToString()
                     }, imageKey: userdata.chat.id.ToString());
                 listViewItem.Name = userdata.chat.id.ToString();
@@ -78,8 +79,9 @@ namespace myTelegramBot {
             WriteToConsole(userList.Count.ToString() + " users added to list", Color.Violet);
         }
         public void RemoveUser(Userdata userData) {
+            //TODO non removing!!
             imageList_users.Images.RemoveByKey(userData.chat.id.ToString());
-            WriteToConsole("user " + userData.user.username +" removed from list", Color.DarkViolet);
+            WriteToConsole("user " + userData.user.username + " REMOVED", Color.DarkViolet);
         }
 
         public void WriteToConsole(string text, Color color) {

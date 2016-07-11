@@ -20,7 +20,11 @@ namespace myTelegramBot {
             formThread.Start();
             formCreated.WaitOne();
             formCreated = null; //this is not supposed to be used anymore
-            form.WaitingTime = Settings.Default.waitTime;
+            try {
+                form.WaitingTime = Settings.Default.waitTime;   //HACK this creates problems
+            } catch ( Exception e ) {
+                MessageBox.Show(e.ToString());
+            }
             #endregion
 
             if ( localUsersData.LoadData() )
