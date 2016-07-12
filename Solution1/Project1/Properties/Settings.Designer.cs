@@ -91,5 +91,17 @@ namespace myTelegramBot.Properties {
                 this["lastDataFileName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int updateUserTime {
+            get {
+                return ((int)(this["updateUserTime"]));
+            }
+            set {
+                this["updateUserTime"] = value;
+            }
+        }
     }
 }

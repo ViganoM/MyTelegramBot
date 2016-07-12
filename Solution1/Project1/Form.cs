@@ -77,7 +77,6 @@ namespace myTelegramBot {
             }
         }
         public void RemoveUser(Userdata userData) {
-            //TODO non removing!!
             imageList_users.Images.RemoveByKey(userData.chat.id.ToString());
             listView_users.Items.RemoveByKey(userData.chat.id.ToString());
         }

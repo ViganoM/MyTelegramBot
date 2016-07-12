@@ -62,9 +62,9 @@ namespace myTelegramBot {
                 //eventually add to localUsers FIRST
                 localUsersData.AddUser(update.message.chat, update.message.from);
                 //parse the message to check if contains commands
-                if (! ParseMessage(update.message) )
-                //give info to userdata of sender
-                localUsersData.usersData[update.message.chat.id].MessageInput(update);
+                if ( !ParseMessage(update.message) )
+                    //give info to userdata of sender
+                    localUsersData.usersData[update.message.chat.id].MessageInput(update);
                 //update ServerMethods.lastUpdate
                 if ( update.update_id > lastUpdate )
                     lastUpdate = update.update_id;
@@ -111,8 +111,9 @@ namespace myTelegramBot {
 
         public static Bitmap getUserPhoto(int user_id) {
             PhotoSize photo = new PhotoSize();
-            List<List<PhotoSize>> photoListList = getUserProfilePhotos(user_id).photos;
-            if ( photoListList == null || photoListList.Count == 0 )
+            UserProfilePhotos userprofilephotos = getUserProfilePhotos(user_id);    //TODO photos are not deserialized!
+            PhotoSize[][] photoListList = userprofilephotos.photos;
+            if ( photoListList == null || photoListList.Length == 0 )
                 return new Bitmap(Resources.MyIcon.ToBitmap());
 
             foreach ( PhotoSize p in photoListList.Last() )
@@ -121,7 +122,7 @@ namespace myTelegramBot {
 
             return new Bitmap(DownloadFile(getFile(photo.file_id).file_path));
         }
-
+        
         static UserProfilePhotos getUserProfilePhotos(int user_id, int offset = 0, int limit = 100) {
             string argument = string.Format("?user_id={0}&offset={1}&limit={2}", user_id, offset, limit);
             string response = new WebClient().DownloadString(website + "getUserProfilePhotos" + argument);
@@ -143,7 +144,7 @@ namespace myTelegramBot {
 
         static public bool ParseMessage(Message message) {
             if ( message.entities == null || message.entities.Count == 0 )
-               return false;
+                return false;
 
             bool foundOne = false;
             foreach ( MessageEntity entity in message.entities )
@@ -156,40 +157,48 @@ namespace myTelegramBot {
                     }
 
             string command = message.text.Substring(message.entities[0].offset, message.entities[0].length);
+            Userdata user = localUsersData.usersData[message.chat.id];
 
             switch ( command ) {
-                //the following cases are the commands allowed in the bot
+                //the following cases are all the commands allowed in the bot
                 case "/start":
                     sendMessage(message.chat.id, "REMEMBER THIS BOT IS STILL IN DEVELOPMENT AND IS NOT WORKING BY NOW\nIf you keep this chat YOU WILL ME NOTIFIED AS SOON AS READY\n\nYou will receive a message at random times. Write something back as soon as you can!");
                     break;
                 case "/faster":
-                    localUsersData.usersData[message.chat.id].speed += 1;
+                    user.speed += 1;
                     sendMessage(message.chat.id, "Speed is now set to " + localUsersData.usersData[message.chat.id].speed + " of 5");
                     break;
                 case "/slower":
-                    localUsersData.usersData[message.chat.id].speed -= 1;
+                    user.speed -= 1;
                     sendMessage(message.chat.id, "Speed is now set to " + localUsersData.usersData[message.chat.id].speed + " of 5");
                     break;
                 case "/pause":
-                    localUsersData.usersData[message.chat.id].activity = activity.Inactive;
+                    user.activity = activity.Inactive;
                     sendMessage(message.chat.id, "I will take a break...\nYou will no longer receive messages until you enter the command /write", true);
                     break;
                 case "/write":
-                    localUsersData.usersData[message.chat.id].activity = activity.WaitingSend;
-                    sendMessage(message.chat.id, restart_phrases[new Random().Next(0, restart_phrases.Count)]+"\nSpeed is "+localUsersData.usersData[message.chat.id].speed);
+                    if ( user.activity == activity.WaitingSend )
+                        sendMessage(message.chat.id, "I am currently active. Sit down and wait my message.");
+                    else {
+                        user.activity = activity.WaitingSend;
+                        sendMessage(message.chat.id, restart_phrases[new Random().Next(0, restart_phrases.Count)] + "\nSpeed is " + localUsersData.usersData[message.chat.id].speed);
+                    }
                     break;
                 case "/notificate":
-                    localUsersData.usersData[message.chat.id].notificate = !localUsersData.usersData[message.chat.id].notificate;
-                    if ( localUsersData.usersData[message.chat.id].notificate )
+                    user.notificate = !user.notificate;
+                    if ( user.notificate)
                         sendMessage(message.chat.id, "Notifications are now active");
                     else
                         sendMessage(message.chat.id, "Notifications are now disabled. Be carefull!");
                     break;
                 case "/support":
-                    Userdata user = localUsersData.usersData[message.chat.id];
                     user.supportRequests++;
-                    sendMessage(Developer_chat_id, "An User request your attention!", true, message.message_id);
+                    sendMessage(Developer_chat_id, "An User request your attention!\n"+message.text, true, message.message_id);
                     sendMessage(Developer_chat_id, string.Format("Details:\nchat_id: {0}\nuser_id: {1}\nUsername: {2}\nFirst name: {3}\nLast name: {4}\nJoin_date: {5}\nResponse_n: {6}\nResponse_avg: {7}\nSpeed: {8}\nNotificate: {9}\nSupport_req: {10}", message.chat.id, message.from.id, message.from.username, message.from.first_name, message.from.last_name, user.joinDate, user.response.Count, user.response.Average(), user.speed, user.notificate, user.supportRequests), true);
+                    sendMessage(message.chat.id, "A message was just sent to the developer.\nHe is magnanimous and will personally contact you.");
+                    break;
+                default:
+                    sendMessage(message.chat.id, "Unrecognized command!", reply_to_message_id: message.message_id);
                     break;
             }
             return true;

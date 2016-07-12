@@ -115,13 +115,21 @@ namespace myTelegramBot {
 
     [Serializable]
     public class Userdata {
-        public Chat chat { get; private set; }  //to keep updated
+        public Chat chat { get; private set; }
         public User user { get; private set; }
         public Bitmap photo { get; private set; }
         public readonly DateTime joinDate;
-        public List<double> response { get; private set; } = new List<double>();
+        DateTime lastUserUpdate = new DateTime(0);
+        List<double > _response = new List<double>();
+        public List<double> response {
+            get {
+                if ( _response.Count == 0 )
+                    return new List<double>() { 0 };
+                return _response;
+            }
+            private set { _response = value; }
+        }
         public int supportRequests = 0;
-        //public DateTime lastSave = new DateTime(0);
 
         public int lastUpdate { get; private set; } = 0;
         int _speed = 3;
@@ -171,13 +179,23 @@ namespace myTelegramBot {
             if ( activity == activity.WaitingSend ) {
                 if ( nextMessageSent - DateTime.Now <= new TimeSpan(0) )
                     Next(true);
-                else
+                else {
                     timer.Interval = (nextMessageSent - DateTime.Now).TotalMilliseconds;
+                    timer.Start();
+                    Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
+                }
             }
 
         }
+        void Update(JsonTypes.Message message) {
+            chat = message.chat;
+            user = message.from;
+            photo = ServerMethods.getUserPhoto(user.id);
+            lastUserUpdate = DateTime.Now;
+        }
 
         public void MessageInput(Update update) {
+
             lastUpdate = update.message.message_id;
             if ( activity == activity.WaitingResponse ) {
                 activity = activity.WaitingSend;
@@ -189,8 +207,11 @@ namespace myTelegramBot {
             else if ( activity == activity.Inactive )
                 ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges", false);
 
+            //user update
+            if ( DateTime.Now - lastUserUpdate > new TimeSpan(Settings.Default.updateUserTime, 0, 0, 0) )
+                Update(update.message);
         }
-        public void Next(bool soon = false) {
+        void Next(bool soon = false) {
             if ( activity == activity.WaitingSend ) {
                 double addSeconds = 0;
                 Random random = new Random();
@@ -214,12 +235,10 @@ namespace myTelegramBot {
                             addSeconds = (random.Next(5, 11) + random.NextDouble()) * 3600;
                             break;
                     }
-                //DEVELOPEMENT
                 timer.Interval = addSeconds * 1000;
                 nextMessageSent = DateTime.Now.AddSeconds(addSeconds);
-                //
                 timer.Start();
-                Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);// + " (" + addSeconds.ToString("#") + " seconds", Color.Blue);
+                Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
             }
         }
         void Send(object sender, ElapsedEventArgs e) {
@@ -228,5 +247,6 @@ namespace myTelegramBot {
             activity = activity.WaitingResponse;
             Program.form.WriteToConsole("Scheduled message sent", Color.Blue);
         }
+
     }
 }

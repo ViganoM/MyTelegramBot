@@ -20,7 +20,7 @@ namespace JsonTypes {
     //UserProfilePhotos
     public class UserProfilePhotos {
         public int total_count { get; set; }
-        public List<List<PhotoSize>> photos { get; set; }
+        public PhotoSize[][] photos { get; set; }
     }
     //File
     public class File {
