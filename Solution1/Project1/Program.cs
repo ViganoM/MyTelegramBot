@@ -33,12 +33,13 @@ namespace myTelegramBot {
                 form.WriteToConsole("Local data NOT RESTORED, you idiot!", System.Drawing.Color.Red);
 
             if ( ServerMethods.GetMe().ok ) {
-                form.WriteToConsole("fully operational", System.Drawing.Color.Green);
+                form.WriteToConsole("FULLY OPERATIONAL", System.Drawing.Color.Green);
                 new Thread(Updater).Start();
                 if ( localUsersData.usersData.Count > 0 )
                     form.SetUsers(localUsersData.usersData.Values.ToList());
                 form.Loading = false;
                 ServerMethods.sendBroadMessage("I am back on\n<b>MV</b>", true);
+                form.WriteToConsole("Welcome message sent", System.Drawing.Color.Blue);
             } else
                 form.WriteToConsole("Telegram doesn't like you!\n(GetMe returned not ok)", System.Drawing.Color.Red);
 
@@ -55,6 +56,7 @@ namespace myTelegramBot {
         }
         public static void Close(object sender, FormClosingEventArgs e) {
             ServerMethods.sendBroadMessage("I will be off for a while\n<b>MV</b>", true);
+            form.WriteToConsole("Farawell message sent", System.Drawing.Color.Blue);
             localUsersData.SaveData();
             Environment.Exit(0);
         }

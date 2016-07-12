@@ -16,6 +16,7 @@ namespace myTelegramBot {
         const string token = "225365907:AAE0D5dgDjzLlwHp5jLVVZMBmRZyPBFpepI";
         const string website = "https://api.telegram.org/bot"+token+"/";
         const string fileWebsite = "https://api.telegram.org/file/bot" + token+"/";
+        const int Developer_chat_id = 157874244;
 
         public enum parse_mode { Markdown, HTML }
         static List<string> restart_phrases = new List<string>() {"I was just waiting this", "I couldn't wait anymore!", "Got it...\nGet ready.." };
@@ -81,7 +82,6 @@ namespace myTelegramBot {
             string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
             if ( reply_to_message_id != -1 )
                 argument += "&reply_to_message_id=" + reply_to_message_id;
-            Program.form.WriteToConsole("Message sent",Color.Blue);
             return sendMessage(argument);
         }
         static public List<Message> sendBroadMessage(string text, bool disable_notification = false, parse_mode parse_mode = parse_mode.HTML) {
@@ -91,8 +91,6 @@ namespace myTelegramBot {
                 string argument = string.Format("?chat_id={0}&text={1}&disable_notification={2}&parse_mode={3}", chat_id, text, disable_notification, parse_mode);
                 messagges.Add(sendMessage(argument));
             }
-            Program.form.WriteToConsole("Broadcast message sent", Color.Blue);
-
             return messagges;
         }
         static public string TextCleaner(ref string text) {
@@ -186,6 +184,12 @@ namespace myTelegramBot {
                         sendMessage(message.chat.id, "Notifications are now active");
                     else
                         sendMessage(message.chat.id, "Notifications are now disabled. Be carefull!");
+                    break;
+                case "/support":
+                    Userdata user = localUsersData.usersData[message.chat.id];
+                    user.supportRequests++;
+                    sendMessage(Developer_chat_id, "An User request your attention!", true, message.message_id);
+                    sendMessage(Developer_chat_id, string.Format("Details:\nchat_id: {0}\nuser_id: {1}\nUsername: {2}\nFirst name: {3}\nLast name: {4}\nJoin_date: {5}\nResponse_n: {6}\nResponse_avg: {7}\nSpeed: {8}\nNotificate: {9}\nSupport_req: {10}", message.chat.id, message.from.id, message.from.username, message.from.first_name, message.from.last_name, user.joinDate, user.response.Count, user.response.Average(), user.speed, user.notificate, user.supportRequests), true);
                     break;
             }
             return true;

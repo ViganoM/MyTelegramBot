@@ -19,7 +19,7 @@ namespace myTelegramBot {
                 label_time_working.Text = value.ToString("# ms");
                 WorkingTimes.Add(value);
                 if ( WorkingTimes.Count % 5 == 0 )
-                    label_time_workingAverage.Text = WorkingTimes.Average().ToString("#0.0 ms");
+                    label_time_workingAverage.Text = WorkingTimes.Average().ToString("#.0 ms");
             }
         }
         public int WaitingTime {
@@ -55,7 +55,6 @@ namespace myTelegramBot {
                 RemoveUser(userData);
             List<Userdata> list = new List<Userdata>() { userData };
             SetUsers(list);
-            WriteToConsole("user " + userData.user.username + " UPDATED", Color.DarkViolet);
         }
         public void SetUsers(List<Userdata> userList, bool clear = false) {
             if ( clear ) {
@@ -76,12 +75,11 @@ namespace myTelegramBot {
                 listViewItem.Name = userdata.chat.id.ToString();
                 listView_users.Items.Add(listViewItem);
             }
-            WriteToConsole(userList.Count.ToString() + " users added to list", Color.Violet);
         }
         public void RemoveUser(Userdata userData) {
             //TODO non removing!!
             imageList_users.Images.RemoveByKey(userData.chat.id.ToString());
-            WriteToConsole("user " + userData.user.username + " REMOVED", Color.DarkViolet);
+            listView_users.Items.RemoveByKey(userData.chat.id.ToString());
         }
 
         public void WriteToConsole(string text, Color color) {

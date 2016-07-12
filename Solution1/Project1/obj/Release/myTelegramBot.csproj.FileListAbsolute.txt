@@ -4,3 +4,6 @@ V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\bin\Release\my
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.exe
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.pdb
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.csprojResolveAssemblyReference.cache
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.Form.resources
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.Properties.Resources.resources
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.csproj.GenerateResource.Cache
