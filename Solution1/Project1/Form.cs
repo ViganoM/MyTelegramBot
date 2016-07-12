@@ -78,8 +78,7 @@ namespace myTelegramBot {
         }
         public void RemoveUser(Userdata userData) {
             imageList_users.Images.RemoveByKey(userData.chat.id.ToString());
-            listView_users.Items.RemoveByKey(userData.chat.id.ToString());
-        }
+            listView_users.Items.RemoveByKey(userData.chat.id.ToString());        }
 
         public void WriteToConsole(string text, Color color) {
             textbox_console.SelectionStart = textbox_console.TextLength;

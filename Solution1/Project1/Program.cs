@@ -28,7 +28,7 @@ namespace myTelegramBot {
             #endregion
 
             if ( localUsersData.LoadData() )
-                form.WriteToConsole("Local data restored from ", System.Drawing.Color.Green);
+                form.WriteToConsole("Local data restored", System.Drawing.Color.Green);
             else
                 form.WriteToConsole("Local data NOT RESTORED, you idiot!", System.Drawing.Color.Red);
 

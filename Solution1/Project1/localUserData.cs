@@ -25,7 +25,7 @@ namespace myTelegramBot {
                 return Settings.Default.DataPath + Settings.Default.DataFileName + Settings.Default.lastDataFileName;
             }
         }
-        static string SavePath {
+        public static string SavePath {
             get {
                 if ( !Directory.Exists(Settings.Default.DataPath) )
                     Directory.CreateDirectory(Settings.Default.DataPath);
