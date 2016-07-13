@@ -68,7 +68,7 @@ namespace myTelegramBot {
             for ( int n = 0 ; n < getUpdates.result.Count ; n++ ) {
 
                 Update update = getUpdates.result[n];
-                                
+
                 //eventually add to localUsers FIRST
                 localUsersData.AddUser(update.message.chat, update.message.from);
                 //parse the message to check if contains commands
@@ -114,9 +114,9 @@ namespace myTelegramBot {
                 response = new WebClient().DownloadString(website + "sendMessage" + argument);
             } catch ( WebException exception ) {
                 System.Windows.Forms.MessageBox.Show("Cannot send a message because of a Web Exception\n\n" + exception.ToString(), "Message not sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
-                while ( argument.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries).Length > 1 ) {
+                while ( argument.Split('&').Length > 2 ) {
                     argument = argument.Replace(argument.Split('&').Last(x => x.Length > 0), "");
-                    argument.TrimEnd('&');
+                    argument = argument.Remove(argument.Length - 1);
                     try {
                         response = new WebClient().DownloadString(website + "sendMessage" + argument);
                         System.Windows.Forms.MessageBox.Show("New attempt was succesfull\nArgument string used was:\n" + argument, "Message eventually sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
@@ -223,9 +223,12 @@ namespace myTelegramBot {
                     break;
                 case "/support":
                     user.supportRequests++;
-                    sendMessage(Developer_chat_id, "An User request your attention!\n" + message.text, true, message.message_id);
+                    sendMessage(Developer_chat_id, "An User request your attention!\n" + message.text, true);
                     sendMessage(Developer_chat_id, string.Format("Details:\nchat_id: {0}\nuser_id: {1}\nUsername: {2}\nFirst name: {3}\nLast name: {4}\nJoin_date: {5}\nResponse_n: {6}\nResponse_avg: {7}\nSpeed: {8}\nNotificate: {9}\nSupport_req: {10}", message.chat.id, message.from.id, message.from.username, message.from.first_name, message.from.last_name, user.joinDate, user.response.Count, user.response.Average(), user.speed, user.notificate, user.supportRequests), true);
                     sendMessage(message.chat.id, "A message was just sent to the developer.\nHe is magnanimous and will personally contact you.");
+                    break;
+                case "/stats":
+                    user.SendStats();
                     break;
                 default:
                     sendMessage(message.chat.id, "Unrecognized command!", reply_to_message_id: message.message_id);

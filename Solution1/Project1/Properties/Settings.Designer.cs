@@ -44,21 +44,15 @@ namespace myTelegramBot.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\")]
         public string DataPath {
             get {
                 return ((string)(this["DataPath"]));
             }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\")]
-        public string PhotoPath {
-            get {
-                return ((string)(this["PhotoPath"]));
+            set {
+                this["DataPath"] = value;
             }
         }
         
@@ -73,7 +67,7 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("data")]
+        [global::System.Configuration.DefaultSettingValueAttribute("BotSavedData")]
         public string DataFileName {
             get {
                 return ((string)(this["DataFileName"]));
@@ -94,13 +88,25 @@ namespace myTelegramBot.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int updateUserTime {
             get {
                 return ((int)(this["updateUserTime"]));
             }
             set {
                 this["updateUserTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double minResponseTime {
+            get {
+                return ((double)(this["minResponseTime"]));
+            }
+            set {
+                this["minResponseTime"] = value;
             }
         }
     }

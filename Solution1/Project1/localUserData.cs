@@ -13,7 +13,7 @@ using myTelegramBot.Properties;
 
 
 namespace myTelegramBot {
-    public enum activity { WaitingSend, WaitingResponse, Inactive }
+    public enum activity { WaitingSend, WaitingResponse, Inactive, PrivacyConsent }
     static class localUsersData {
         static string now {
             get { return DateTime.Now.ToString(Settings.Default.datetimeFormat); }
@@ -53,6 +53,7 @@ namespace myTelegramBot {
                 Program.form.SetUsers(new List<Userdata>());
         }
 
+        //TODO delete old files!
         public static void SaveData() {
             try {
                 string end = now;
@@ -203,18 +204,38 @@ namespace myTelegramBot {
         }
 
         public void MessageInput(Update update) {
-
             lastUpdate = update.message.message_id;
-            if ( activity == activity.WaitingResponse ) {
-                activity = activity.WaitingSend;
-                TimeSpan delta = DateTime.Now - lastMessageSent;
-                response.Add(delta.TotalSeconds);
-                ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds.ToString("#.0") + " seconds.");
-            } else if ( activity == activity.WaitingSend )
-                ServerMethods.sendMessage(chat.id, "What do you mean?\nUse commands or wait my next message", false, update.message.message_id);
-            else if ( activity == activity.Inactive )
-                ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges", false);
-
+            switch ( activity ) {
+                case activity.WaitingResponse:
+                    activity = activity.WaitingSend;
+                    TimeSpan delta = DateTime.Now - lastMessageSent;
+                    ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds.ToString("#.000") + " seconds.");
+                    if ( delta.TotalSeconds < Settings.Default.minResponseTime ) {
+                        ServerMethods.sendMessage(chat.id, "That's a new record!\nWould you like to share it with other users? (They will know your username and your record; if you did not set an username, your first name will be used instead)\nWrite <i>yes</i> for yes (case insensitive).\nWrite anything else for no.\nbtw: You will not receive other messagges until you answer me.");
+                        activity = activity.PrivacyConsent;
+                        Settings.Default.minResponseTime = delta.Seconds;
+                    } else if ( delta.TotalSeconds < response.Min() )
+                        ServerMethods.sendMessage(chat.id, "That's a new personal record!\nYour previous record was " + response.Min().ToString("#.000") + " seconds.");
+                    response.Add(delta.TotalSeconds);
+                    break;
+                case activity.WaitingSend:
+                    ServerMethods.sendMessage(chat.id, "What do you mean?\nUse commands or wait my next message", reply_to_message_id: update.message.message_id);
+                    break;
+                case activity.Inactive:
+                    ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges");
+                    break;
+                case activity.PrivacyConsent:
+                    if ( update.message.text.ToLower() == "yes" )
+                        if ( response.Min() < Settings.Default.minResponseTime )
+                            ShareRecord();
+                        else
+                            ServerMethods.sendMessage(chat.id, "You took too long to answer. Strange right?\nThere is a new record now...");
+                    else
+                        ServerMethods.sendMessage(chat.id, "Ok. I'll keep your secret.");
+                    activity = activity.Inactive;
+                    ServerMethods.sendMessage(chat.id, "Use command /write to receive messagges.\nBy now I'm idle.");
+                    break;
+            }
             //user update
             if ( DateTime.Now - lastUserUpdate > new TimeSpan(Settings.Default.updateUserTime, 0, 0, 0) )
                 Update(update.message);
@@ -250,11 +271,20 @@ namespace myTelegramBot {
             }
         }
         void Send(object sender, ElapsedEventArgs e) {
-            ServerMethods.sendMessage(chat.id, "Answer this!\nSent: " + DateTime.Now.ToString("HH:mm.ss"), !notificate);
+            ServerMethods.sendMessage(chat.id, "Answer this!\nI sent this: " + DateTime.Now.ToString("HH:mm.ss.fff"), !notificate);
             lastMessageSent = DateTime.Now;
             activity = activity.WaitingResponse;
             Program.form.WriteToConsole("Scheduled message sent", Color.Blue);
         }
 
+        public void SendStats() {
+            ServerMethods.sendMessage(chat.id, string.Format("Here are your stats:\nNumber of responses: {0}\nAverage response time: <b>{1}</b>\nJoin Date: {2}\nSpeed: {3}\nActivity: {4}\nNotification active?: {5}\nLast message I sent: {6}", response.Count, response.Average(), joinDate.ToLongDateString(), speed, activity.ToString(), notificate, lastMessageSent.ToString("HH:mm.ss.fff - ddd dd MMMM yyyy")));
+        }
+        void ShareRecord() {
+            string name = user.first_name;
+            if ( user.username != null )
+                name = user.username;
+            ServerMethods.sendBroadMessage("The user " + name + " just answered a message in " + response.Min().ToString("#.000") + " seconds!");
+            }
     }
 }

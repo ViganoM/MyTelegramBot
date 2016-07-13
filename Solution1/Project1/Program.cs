@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows.Forms;
 using myTelegramBot.Properties;
 using System.Diagnostics;
+using JsonTypes;
 
 namespace myTelegramBot {
     public class Program {
