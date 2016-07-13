@@ -32,7 +32,6 @@ namespace myTelegramBot {
                 return Settings.Default.DataPath + Settings.Default.DataFileName;
             }
         }
-        static object lockSaving = new object();
 
         public static Dictionary<int, Userdata> usersData { get; private set; } = new Dictionary<int, Userdata>();
 
@@ -57,16 +56,15 @@ namespace myTelegramBot {
         public static void SaveData() {
             try {
                 string end = now;
-                lock ( lockSaving )
-                    new BinaryFormatter().Serialize(new FileStream(SavePath + end, FileMode.Create, FileAccess.Write), usersData);
+
+                new BinaryFormatter().Serialize(new FileStream(SavePath + end, FileMode.Create, FileAccess.Write), usersData);
                 Settings.Default.lastDataFileName = end;
             } catch ( Exception exception ) {
                 MessageBox.Show("Settings could not be saved.\nA new attempt will be made 1 second after this box will be closed.\nSettings will be saved in folder:\n" + Settings.Default.DataPath + "\nin a file whose name starts with:\n" + Settings.Default.DataFileName + "\nplus date and time of saving, in format:\n" + Settings.Default.datetimeFormat + "\nplus:\n_2nd\n\n" + exception.ToString(), "Settings not saved", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 try {
                     Thread.Sleep(1000);
                     string end = now;
-                    lock ( lockSaving )
-                        new BinaryFormatter().Serialize(new FileStream(SavePath + end + "_2nd", FileMode.Create, FileAccess.Write), usersData);
+                    new BinaryFormatter().Serialize(new FileStream(SavePath + end + "_2nd", FileMode.Create, FileAccess.Write), usersData);
                     Settings.Default.lastDataFileName = end;
 
                     MessageBox.Show("Settings were eventually saved at:\n" + Settings.Default.DataPath + end + "_2nd\nPlease manually manage the settings files", "Settings eventually saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -78,7 +76,6 @@ namespace myTelegramBot {
             }
             Settings.Default.lastUpdate = ServerMethods.lastUpdate;
             Settings.Default.Save();
-
         }
         public static bool LoadData(bool reset = false) {
             if ( reset ) {
@@ -91,8 +88,7 @@ namespace myTelegramBot {
             Program.form.WriteToConsole("Last Update setting restored;\nLast update was " + ServerMethods.lastUpdate, Color.Green);
 
             try {
-                lock ( lockSaving )
-                    usersData = new BinaryFormatter().Deserialize(new FileStream(LoadPath, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
+                usersData = new BinaryFormatter().Deserialize(new FileStream(LoadPath, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
                 Program.form.WriteToConsole("Settings succesfully restored from " + LoadPath, Color.Green);
                 #region update non serialized stuff
                 foreach ( Userdata userdata in usersData.Values )
@@ -102,7 +98,22 @@ namespace myTelegramBot {
                 return true;
             } catch ( FileNotFoundException fileNotFound ) {
                 Program.form.WriteToConsole("Settings file not found", Color.Red);
-                MessageBox.Show("Settings not restored because the file could not be found:\n" + LoadPath + "\n\n" + fileNotFound.ToString(), "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Settings not restored because the file could not be found:\n" + LoadPath + "\nA new attempt will be made looking for older files after this box will be closed\n\n" + fileNotFound.ToString(), "Settings not restored", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                FileInfo[] list = new DirectoryInfo(Settings.Default.DataPath).GetFiles().OrderByDescending(x => x.CreationTime).ToArray();
+                foreach ( FileInfo file in list )
+                    try {
+                        usersData = new BinaryFormatter().Deserialize(new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
+                        Program.form.WriteToConsole("Settings succesfully restored from " + file.FullName, Color.Green);
+                        MessageBox.Show("Settings restored from file:\n" + file.FullName + "\nInstead of file:\n" + LoadPath, "Settings restores from an unexpected file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return true;
+                    } catch {
+                        Program.form.WriteToConsole("Settings not restored from " + file.FullName, Color.Red);
+                    }
+
+                Program.form.WriteToConsole("Settings could no be restored from files in folder " + Settings.Default.DataPath, Color.Red);
+                MessageBox.Show("Settings not restored from any file in path:\n" + Settings.Default.DataPath + "\nConsider to change the data saving folder", "Settings definitely not restored", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return false;
             } catch ( Exception exception ) {
                 //TODO allow the choise of a file and load it
@@ -110,14 +121,13 @@ namespace myTelegramBot {
                 MessageBox.Show("Settings not restored\n" + exception.ToString(), "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-        }   //TODO load last saving if failsS
+        }
     }
 
     [Serializable]
     public class Userdata {
         public Chat chat { get; private set; }
         public User user { get; private set; }
-        public Bitmap photo { get; private set; }
         public readonly DateTime joinDate;
         DateTime lastUserUpdate = new DateTime(0);
         List<double > _response = new List<double>();
@@ -165,7 +175,6 @@ namespace myTelegramBot {
         public Userdata(Chat chatItem, User userItem) {
             chat = chatItem;
             user = userItem;
-            photo = ServerMethods.getUserPhoto(user.id);
             joinDate = DateTime.Now;
             timer.Elapsed += new ElapsedEventHandler(Send);
             timer.AutoReset = false;
@@ -190,7 +199,6 @@ namespace myTelegramBot {
         void Update(JsonTypes.Message message) {
             chat = message.chat;
             user = message.from;
-            photo = ServerMethods.getUserPhoto(user.id);
             lastUserUpdate = DateTime.Now;
         }
 

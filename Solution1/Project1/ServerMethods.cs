@@ -65,9 +65,10 @@ namespace myTelegramBot {
                 return new getUpdates();
             }
             getUpdates getUpdates = new JavaScriptSerializer().Deserialize<getUpdates>(response);
-
             for ( int n = 0 ; n < getUpdates.result.Count ; n++ ) {
+
                 Update update = getUpdates.result[n];
+                                
                 //eventually add to localUsers FIRST
                 localUsersData.AddUser(update.message.chat, update.message.from);
                 //parse the message to check if contains commands
@@ -113,8 +114,8 @@ namespace myTelegramBot {
                 response = new WebClient().DownloadString(website + "sendMessage" + argument);
             } catch ( WebException exception ) {
                 System.Windows.Forms.MessageBox.Show("Cannot send a message because of a Web Exception\n\n" + exception.ToString(), "Message not sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
-                while ( argument.Split('&', StringSplitOptions.RemoveEmptyEntries).Length > 1 ) { //WTF
-                    argument = argument.Replace(argument.Split('&').Last(x=>x.Length>0), "");
+                while ( argument.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries).Length > 1 ) {
+                    argument = argument.Replace(argument.Split('&').Last(x => x.Length > 0), "");
                     argument.TrimEnd('&');
                     try {
                         response = new WebClient().DownloadString(website + "sendMessage" + argument);
@@ -137,6 +138,7 @@ namespace myTelegramBot {
             return new JavaScriptSerializer().Deserialize<getChat>(response);
         }
 
+        /*Photos
         public static Bitmap getUserPhoto(int user_id) {
             PhotoSize photo = new PhotoSize();
             UserProfilePhotos userprofilephotos = getUserProfilePhotos(user_id);    //TODO photos are not deserialized!
@@ -169,7 +171,7 @@ namespace myTelegramBot {
             new WebClient().DownloadFile(fileWebsite + file_path, path);
             return path;
         }
-
+        */
         static public bool ParseMessage(Message message) {
             if ( message.entities == null || message.entities.Count == 0 )
                 return false;

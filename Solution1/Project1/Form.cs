@@ -57,12 +57,10 @@ namespace myTelegramBot {
             SetUsers(list);
         }
         public void SetUsers(List<Userdata> userList, bool clear = false) {
-            if ( clear ) {
-                imageList_users.Images.Clear();
+            if ( clear )
                 listView_users.Clear();
-            }
+           
             foreach ( Userdata userdata in userList ) {
-                imageList_users.Images.Add(userdata.chat.id.ToString(), userdata.photo);
                 ListViewItem listViewItem = new ListViewItem(new string[7] {
                         userdata.chat.id.ToString(),
                         userdata.chat.username,
@@ -77,8 +75,8 @@ namespace myTelegramBot {
             }
         }
         public void RemoveUser(Userdata userData) {
-            imageList_users.Images.RemoveByKey(userData.chat.id.ToString());
-            listView_users.Items.RemoveByKey(userData.chat.id.ToString());        }
+            listView_users.Items.RemoveByKey(userData.chat.id.ToString());
+        }
 
         public void WriteToConsole(string text, Color color) {
             textbox_console.SelectionStart = textbox_console.TextLength;
@@ -95,6 +93,10 @@ namespace myTelegramBot {
         private void Form_FormClosing(object sender, FormClosingEventArgs e) {
             WriteToConsole("process is closing", Color.OrangeRed);
             Program.Close(sender, e);
+        }
+
+        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e) {
+
         }
     }
 }

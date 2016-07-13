@@ -23,10 +23,8 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form));
-            this.imageList_users = new System.Windows.Forms.ImageList(this.components);
             this.label_light_loading = new System.Windows.Forms.Label();
             this.label_light_working = new System.Windows.Forms.Label();
             this.label_light_waiting = new System.Windows.Forms.Label();
@@ -41,13 +39,12 @@
             this.column_active = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.column_speed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabPage_settings = new System.Windows.Forms.TabPage();
+            this.button1 = new System.Windows.Forms.Button();
             this.textbox_console = new System.Windows.Forms.RichTextBox();
             this.label_time_working = new System.Windows.Forms.Label();
             this.label_time_workingAverage = new System.Windows.Forms.Label();
             this.label_time_waiting = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.button1 = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPage_users.SuspendLayout();
             this.tabPage_settings.SuspendLayout();
@@ -56,12 +53,6 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // imageList_users
-            // 
-            this.imageList_users.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageList_users.ImageSize = new System.Drawing.Size(16, 16);
-            this.imageList_users.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // label_light_loading
             // 
@@ -133,11 +124,9 @@
             listViewGroup1.Name = "listViewGroup1";
             this.listView_users.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1});
-            this.listView_users.LargeImageList = this.imageList_users;
             this.listView_users.Location = new System.Drawing.Point(3, 3);
             this.listView_users.Name = "listView_users";
             this.listView_users.Size = new System.Drawing.Size(377, 307);
-            this.listView_users.SmallImageList = this.imageList_users;
             this.listView_users.TabIndex = 3;
             this.listView_users.UseCompatibleStateImageBehavior = false;
             this.listView_users.View = System.Windows.Forms.View.Details;
@@ -180,6 +169,15 @@
             this.tabPage_settings.TabIndex = 2;
             this.tabPage_settings.Text = "Settings";
             this.tabPage_settings.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(6, 8);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(131, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "SetPath";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // textbox_console
             // 
@@ -245,20 +243,7 @@
             this.splitContainer1.Size = new System.Drawing.Size(651, 339);
             this.splitContainer1.SplitterDistance = 256;
             this.splitContainer1.TabIndex = 16;
-            // 
-            // openFileDialog
-            // 
-            this.openFileDialog.FileName = "openFileDialog";
-            this.openFileDialog.Filter = "\" |*.\"";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(6, 8);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(131, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "SetPath";
-            this.button1.UseVisualStyleBackColor = true;
+            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
             // 
             // Form
             // 
@@ -284,7 +269,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.ImageList imageList_users;
         private System.Windows.Forms.Label label_light_loading;
         private System.Windows.Forms.Label label_light_working;
         private System.Windows.Forms.Label label_light_waiting;
@@ -304,7 +288,6 @@
         private System.Windows.Forms.Label label_time_workingAverage;
         private System.Windows.Forms.Label label_time_waiting;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Button button1;
     }
 }
