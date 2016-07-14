@@ -43,7 +43,6 @@
             this.textbox_console = new System.Windows.Forms.RichTextBox();
             this.label_time_working = new System.Windows.Forms.Label();
             this.label_time_workingAverage = new System.Windows.Forms.Label();
-            this.label_time_waiting = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tabControl.SuspendLayout();
             this.tabPage_users.SuspendLayout();
@@ -211,14 +210,6 @@
             this.label_time_workingAverage.TabIndex = 14;
             this.label_time_workingAverage.Text = "0 ms";
             // 
-            // label_time_waiting
-            // 
-            this.label_time_waiting.Location = new System.Drawing.Point(74, 22);
-            this.label_time_waiting.Name = "label_time_waiting";
-            this.label_time_waiting.Size = new System.Drawing.Size(52, 13);
-            this.label_time_waiting.TabIndex = 15;
-            this.label_time_waiting.Text = "0 ms";
-            // 
             // splitContainer1
             // 
             this.splitContainer1.BackColor = System.Drawing.SystemColors.Control;
@@ -228,7 +219,6 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.label_time_waiting);
             this.splitContainer1.Panel1.Controls.Add(this.label_light_waiting);
             this.splitContainer1.Panel1.Controls.Add(this.label_time_workingAverage);
             this.splitContainer1.Panel1.Controls.Add(this.label_light_working);
@@ -286,7 +276,6 @@
         private System.Windows.Forms.RichTextBox textbox_console;
         private System.Windows.Forms.Label label_time_working;
         private System.Windows.Forms.Label label_time_workingAverage;
-        private System.Windows.Forms.Label label_time_waiting;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button button1;
     }

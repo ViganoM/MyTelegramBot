@@ -24,7 +24,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="minResponseTime_s" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="lastUpdateId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

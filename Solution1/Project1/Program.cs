@@ -21,7 +21,6 @@ namespace myTelegramBot {
             formThread.Start();
             formCreated.WaitOne();
             formCreated = null; //this is not supposed to be used anymore
-            form.WaitingTime = Settings.Default.updateLoopSleepDuration_ms;   //HACK this creates problems
             #endregion
 
             if ( localUsersData.LoadData() )

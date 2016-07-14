@@ -32,7 +32,7 @@ namespace myTelegramBot {
                 return Settings.Default.DataFolderPath + Settings.Default.settingFilename;
             }
         }
-        public static string LogFilepath { get { return Settings.Default.DataFolderPath + "_LOG"; } }
+        public static string LogFilepath { get { return Settings.Default.DataFolderPath + Settings.Default.settingFilename + "_LOG.txt"; } }
 
         public static Dictionary<int, Userdata> usersData { get; private set; } = new Dictionary<int, Userdata>();
 
@@ -66,7 +66,7 @@ namespace myTelegramBot {
                 end = now;
                 try {
                     new BinaryFormatter().Serialize(new FileStream(SaveFilepath + end + "_2nd", FileMode.Create, FileAccess.Write), usersData);
-                    Settings.Default.lastSettingFilename = end+"_2nd";
+                    Settings.Default.lastSettingFilename = end + "_2nd";
                     //MessageBox.Show("Settings were eventually saved at:\n" + Settings.Default.DataFolderPath + end + "_2nd\nPlease manually manage the settings files", "Settings eventually saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 } catch ( SerializationException exception2 ) {
                     System.IO.File.AppendAllLines(LogFilepath, exception2.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
@@ -85,6 +85,8 @@ namespace myTelegramBot {
             }
 
             ServerMethods.lastUpdate = Settings.Default.lastUpdateId;
+            if ( Settings.Default.minResponseTime_s <= 0)
+                Settings.Default.minResponseTime_s = double.MaxValue;
 
             try {
                 usersData = new BinaryFormatter().Deserialize(new FileStream(LoadFilepath, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
@@ -102,10 +104,10 @@ namespace myTelegramBot {
                 System.IO.File.AppendAllLines(LogFilepath, serializationEx.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
                 return SecondLoad();
             }
-            }
-        
+        }
+
         static bool SecondLoad() {
-            FileInfo[] list = new DirectoryInfo(Settings.Default.DataFolderPath).GetFiles().OrderByDescending(x => x.CreationTime).ToArray();
+            FileInfo[] list = new DirectoryInfo(Settings.Default.DataFolderPath).GetFiles().Where(x => x.Name.StartsWith(Settings.Default.settingFilename)).Where(x => !x.Name.Contains("_LOG")).OrderByDescending(x => x.CreationTime).ToArray();
             foreach ( FileInfo file in list )
                 try {
                     usersData = new BinaryFormatter().Deserialize(new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
@@ -113,9 +115,9 @@ namespace myTelegramBot {
                     return true;
                 } catch ( SerializationException serializationEx ) {
                     Program.form.WriteToConsole("Settings not restored from " + file.FullName, Color.Red);
-                    System.IO.File.AppendAllLines(LogFilepath , serializationEx.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+                    System.IO.File.AppendAllLines(LogFilepath, serializationEx.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
                 }
-            System.IO.File.AppendAllLines(LogFilepath, (new Exception("Settings could not be restored from any file in path:\n" + Settings.Default.DataFolderPath)).ToString().Split(new string[] { "\n" },StringSplitOptions.None).ToArray());
+            System.IO.File.AppendAllLines(LogFilepath, (new Exception("Settings could not be restored from any file in path:\n" + Settings.Default.DataFolderPath)).ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
             // MessageBox.Show("Settings not restored from any file in path:\n" + Settings.Default.DataFolderPath + "\nConsider to change the data saving folder", "Settings definitely not restored", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             return false;
@@ -123,173 +125,182 @@ namespace myTelegramBot {
 
         public static void DeleteOld() {
             FileInfo[] files = new DirectoryInfo(Settings.Default.DataFolderPath).GetFiles("*", SearchOption.AllDirectories).OrderBy(x => x.CreationTime).ToArray();
-            if ( files.Sum(x => x.Length) > Settings.Default.maxDataFolderSize_MB * 1024 * 1024 )
+            if ( files.Sum(x => x.Length) > 0 )//Settings.Default.maxDataFolderSize_MB * 1024 * 1024 )
                 for ( int n = 0 ; n < files.Length / 2 ; n++ )
                     if ( !files[n].Name.Contains("_LOG") )
                         files[n].Delete();
         }
     }
 
-[Serializable]
-public class Userdata {
-    public Chat chat { get; private set; }
-    public User user { get; private set; }
-    public readonly DateTime joinDate;
-    DateTime lastUserUpdate = new DateTime(0);
-    List<double > _response = new List<double>();
-    public List<double> response {
-        get {
-            if ( _response.Count == 0 )
-                return new List<double>() { 0 };
-            return _response;
+    [Serializable]
+    public class Userdata {
+        public Chat chat { get; private set; }
+        public User user { get; private set; }
+        public readonly DateTime joinDate;
+        DateTime lastUserUpdate = new DateTime(0);
+        List<double > _response = new List<double>();
+        public List<double> response {
+            get {
+                if ( _response.Count == 0 )
+                    return new List<double>() { 0 };
+                return _response;
+            }
+            private set { _response = value; }
         }
-        private set { _response = value; }
-    }
-    public int supportRequests = 0;
+        public int supportRequests = 0;
 
-    public int lastUpdate { get; private set; } = 0;
-    int _speed = 3;
-    public int speed {
-        get { return _speed; }
-        set {
-            if ( value >= 1 && value <= 5 )
-                _speed = value;
-            Program.form.SetUser(this);
-        }
-    }
-    activity _activity = activity.WaitingSend;
-    public activity activity {
-        get { return _activity; }
-        set {
-            _activity = value;
-            if ( activity == activity.Inactive )
-                timer.Stop();
-            else if ( activity == activity.WaitingSend )
-                Next();
-
-            Program.form.SetUser(this);
-        }
-    }
-    public bool notificate=true;
-
-    [NonSerialized]
-    System.Timers.Timer timer = new System.Timers.Timer();
-    DateTime nextMessageSent;
-    DateTime lastMessageSent;
-
-
-    public Userdata(Chat chatItem, User userItem) {
-        chat = chatItem;
-        user = userItem;
-        joinDate = DateTime.Now;
-        timer.Elapsed += new ElapsedEventHandler(Send);
-        timer.AutoReset = false;
-        Next();
-    }
-    public void Restore() {
-        response = new List<double>();
-        timer = new System.Timers.Timer();
-        timer.Elapsed += new ElapsedEventHandler(Send);
-        timer.AutoReset = false;
-        if ( activity == activity.WaitingSend ) {
-            if ( nextMessageSent - DateTime.Now <= new TimeSpan(0) )
-                Next(true);
-            else {
-                timer.Interval = (nextMessageSent - DateTime.Now).TotalMilliseconds;
-                timer.Start();
-                Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
+        public int lastUpdate { get; private set; } = 0;
+        int _speed = 3;
+        public int speed {
+            get { return _speed; }
+            set {
+                if ( value >= 1 && value <= 5 )
+                    _speed = value;
+                Program.form.SetUser(this);
             }
         }
-
-    }
-    void Update(JsonTypes.Message message) {
-        chat = message.chat;
-        user = message.from;
-        lastUserUpdate = DateTime.Now;
-    }
-
-    public void MessageInput(Update update) {
-        lastUpdate = update.message.message_id;
-        switch ( activity ) {
-            case activity.WaitingResponse:
-                activity = activity.WaitingSend;
-                TimeSpan delta = DateTime.Now - lastMessageSent;
-                ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds.ToString("#.000") + " seconds.");
-                if ( delta.TotalSeconds < Settings.Default.minResponseTime_s ) {
-                    ServerMethods.sendMessage(chat.id, "That's a new record!\nWould you like to share it with other users? (They will know your username and your record; if you did not set an username, your first name will be used instead)\nWrite <i>yes</i> for yes (case insensitive).\nWrite anything else for no.\nbtw: You will not receive other messagges until you answer me.");
-                    activity = activity.PrivacyConsent;
-                    Settings.Default.minResponseTime_s = delta.Seconds;
-                } else if ( delta.TotalSeconds < response.Min() )
-                    ServerMethods.sendMessage(chat.id, "That's a new personal record!\nYour previous record was " + response.Min().ToString("#.000") + " seconds.");
-                response.Add(delta.TotalSeconds);
-                break;
-            case activity.WaitingSend:
-                ServerMethods.sendMessage(chat.id, "What do you mean?\nUse commands or wait my next message", reply_to_message_id: update.message.message_id);
-                break;
-            case activity.Inactive:
-                ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges");
-                break;
-            case activity.PrivacyConsent:
-                if ( update.message.text.ToLower() == "yes" )
-                    if ( response.Min() < Settings.Default.minResponseTime_s )
-                        ShareRecord();
-                    else
-                        ServerMethods.sendMessage(chat.id, "You took too long to answer. Strange right?\nThere is a new record now...");
-                else
-                    ServerMethods.sendMessage(chat.id, "Ok. I'll keep your secret.");
-                activity = activity.Inactive;
-                ServerMethods.sendMessage(chat.id, "Use command /write to receive messagges.\nBy now I'm idle.");
-                break;
-        }
-        //user update
-        if ( DateTime.Now - lastUserUpdate > new TimeSpan(Settings.Default.userUpdatePeriod_day, 0, 0, 0) )
-            Update(update.message);
-    }
-    void Next(bool soon = false) {
-        if ( activity == activity.WaitingSend ) {
-            double addSeconds = 0;
-            Random random = new Random();
-            if ( soon )
-                addSeconds = random.NextDouble() * 3600;    //between 0 and 1 hour
-            else
-                switch ( _speed ) {
-                    case 1:
-                        addSeconds = (random.Next(25, 51) + random.NextDouble()) * 3600;
+        activity _activity = activity.WaitingSend;
+        public activity activity {
+            get { return _activity; } set
+            {
+                _activity = value;
+                switch ( _activity ) {
+                    case activity.Inactive:
+                        timer.Stop();
                         break;
-                    case 2:
-                        addSeconds = (random.Next(20, 41) + random.NextDouble()) * 3600;
+                    case activity.WaitingSend:
+                        Next();
                         break;
-                    case 3:
-                        addSeconds = (random.Next(15, 31) + random.NextDouble()) * 3600;
-                        break;
-                    case 4:
-                        addSeconds = (random.Next(10, 21) + random.NextDouble()) * 3600;
-                        break;
-                    case 5:
-                        addSeconds = (random.Next(5, 11) + random.NextDouble()) * 3600;
+                    case activity.PrivacyConsent:
+                        timer.Stop();
                         break;
                 }
-            timer.Interval = addSeconds * 1000;
-            nextMessageSent = DateTime.Now.AddSeconds(addSeconds);
-            timer.Start();
-            Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
+                Program.form.SetUser(this);
+            }
+        }
+        public bool notificate=true;
+
+        [NonSerialized]
+        System.Timers.Timer timer = new System.Timers.Timer();
+        DateTime nextMessageSent;
+        DateTime lastMessageSent;
+
+
+        public Userdata(Chat chatItem, User userItem) {
+            chat = chatItem;
+            user = userItem;
+            joinDate = DateTime.Now;
+            timer.Elapsed += new ElapsedEventHandler(Send);
+            timer.AutoReset = false;
+            Next();
+        }
+        public void Restore() {
+            response = new List<double>();
+            timer = new System.Timers.Timer();
+            timer.Elapsed += new ElapsedEventHandler(Send);
+            timer.AutoReset = false;
+            if ( activity == activity.WaitingSend ) {
+                if ( nextMessageSent - DateTime.Now <= new TimeSpan(0) )
+                    Next(true);
+                else {
+                    timer.Interval = (nextMessageSent - DateTime.Now).TotalMilliseconds;
+                    timer.Start();
+                    Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
+                }
+            }
+
+        }
+        void Update(Message message) {
+            chat = message.chat;
+            user = message.from;
+            lastUserUpdate = DateTime.Now;
+        }
+
+        //TODO make delta time message related, and not use local time!
+        //TODO change string time format
+        public void MessageInput(Update update) {
+            lastUpdate = update.message.message_id;
+            switch ( activity ) {
+                case activity.WaitingResponse:
+                    activity = activity.WaitingSend;
+                    TimeSpan delta = DateTime.Now - lastMessageSent;
+                    ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds.ToString("#0.000") + " seconds.");
+                    if ( delta.TotalSeconds < Settings.Default.minResponseTime_s ) {
+                        ServerMethods.sendMessage(chat.id, "That's a new record!\nWould you like to share it with other users? (They will know your username and your record; if you did not set an username, your first name will be used instead)\nWrite <i>yes</i> for yes (case insensitive).\nWrite anything else for no.\nbtw: You will not receive other messagges until you answer me.");
+                        activity = activity.PrivacyConsent;
+                        Settings.Default.minResponseTime_s = delta.TotalSeconds;
+                    } else if ( delta.TotalSeconds < response.Min() )
+                        ServerMethods.sendMessage(chat.id, "That's a new personal record!\nYour previous record was " + response.Min().ToString("#0.000") + " seconds.");
+                    _response.Add(delta.TotalSeconds);
+                    break;
+                case activity.WaitingSend:
+                    ServerMethods.sendMessage(chat.id, "What do you mean?\nUse commands or wait my next message", reply_to_message_id: update.message.message_id);
+                    break;
+                case activity.Inactive:
+                    ServerMethods.sendMessage(chat.id, "Currently I am not sending you messagges. Use \\write to receive messagges");
+                    break;
+                case activity.PrivacyConsent:
+                    if ( update.message.text.ToLower() == "yes" )
+                        if ( response.Min() <= Settings.Default.minResponseTime_s )
+                            ShareRecord();
+                        else
+                            ServerMethods.sendMessage(chat.id, "You took too long to answer. Strange right?\nThere is a new record now...");
+                    else
+                        ServerMethods.sendMessage(chat.id, "Ok. I'll keep your secret.");
+                    activity = activity.Inactive;
+                    ServerMethods.sendMessage(chat.id, "Use command /write to receive messagges.\nBy now I'm idle.");
+                    break;
+            }
+            //user update
+            if ( DateTime.Now - lastUserUpdate > new TimeSpan(Settings.Default.userUpdatePeriod_day, 0, 0, 0) )
+                Update(update.message);
+        }
+        void Next(bool soon = false) {
+            if ( activity == activity.WaitingSend ) {
+                double addSeconds= double.MaxValue;
+                Random random = new Random();
+                if ( soon )
+                    addSeconds = random.NextDouble() * 3600;    //between 0 and 1 hour
+                else
+                    switch ( _speed ) {
+                        case 1:
+                            addSeconds = (random.Next(25, 51) + random.NextDouble());
+                            break;
+                        case 2:
+                            addSeconds = (random.Next(20, 41) + random.NextDouble());
+                            break;
+                        case 3:
+                            addSeconds = (random.Next(15, 31) + random.NextDouble());
+                            break;
+                        case 4:
+                            addSeconds = (random.Next(10, 21) + random.NextDouble());
+                            break;
+                        case 5:
+                            addSeconds = (random.Next(5, 11) + random.NextDouble());
+                            break;
+                    }
+                //addSeconds *= 3600;
+                timer.Interval = addSeconds * 1000;
+                nextMessageSent = DateTime.Now.AddSeconds(addSeconds);
+                timer.Start();
+                Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss") + "of " + nextMessageSent.ToShortDateString(), Color.Blue);
+            }
+        }
+        void Send(object sender, ElapsedEventArgs e) {
+            ServerMethods.sendMessage(chat.id, "Answer this!\nI sent this: " + DateTime.Now.ToString("HH:mm.ss.fff"), !notificate);
+            lastMessageSent = DateTime.Now;
+            activity = activity.WaitingResponse;
+            Program.form.WriteToConsole("Scheduled message sent", Color.Blue);
+        }
+
+        public void SendStats() {
+            ServerMethods.sendMessage(chat.id, string.Format("Here are your stats:\nNumber of responses: {0}\nAverage response time: <b>{1}</b>\nJoin Date: {2}\nSpeed: {3}\nActivity: {4}\nNotification active?: {5}\nLast message I sent: {6}", response.Count, response.Average(), joinDate.ToLongDateString(), speed, activity.ToString(), notificate, lastMessageSent.ToString("HH:mm.ss.fff - ddd dd MMMM yyyy")));
+        }
+        void ShareRecord() {
+            string name = user.first_name;
+            if ( user.username != null )
+                name = user.username;
+            ServerMethods.sendBroadMessage("The user " + name + " just answered a message in " + response.Min().ToString("#.000") + " seconds!");
         }
     }
-    void Send(object sender, ElapsedEventArgs e) {
-        ServerMethods.sendMessage(chat.id, "Answer this!\nI sent this: " + DateTime.Now.ToString("HH:mm.ss.fff"), !notificate);
-        lastMessageSent = DateTime.Now;
-        activity = activity.WaitingResponse;
-        Program.form.WriteToConsole("Scheduled message sent", Color.Blue);
-    }
-
-    public void SendStats() {
-        ServerMethods.sendMessage(chat.id, string.Format("Here are your stats:\nNumber of responses: {0}\nAverage response time: <b>{1}</b>\nJoin Date: {2}\nSpeed: {3}\nActivity: {4}\nNotification active?: {5}\nLast message I sent: {6}", response.Count, response.Average(), joinDate.ToLongDateString(), speed, activity.ToString(), notificate, lastMessageSent.ToString("HH:mm.ss.fff - ddd dd MMMM yyyy")));
-    }
-    void ShareRecord() {
-        string name = user.first_name;
-        if ( user.username != null )
-            name = user.username;
-        ServerMethods.sendBroadMessage("The user " + name + " just answered a message in " + response.Min().ToString("#.000") + " seconds!");
-    }
-}
 }

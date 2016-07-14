@@ -119,7 +119,7 @@ namespace myTelegramBot {
                     try {
                         response = new WebClient().DownloadString(website + "sendMessage" + argument);
                         //System.Windows.Forms.MessageBox.Show("New attempt was succesfull\nArgument string used was:\n" + argument, "Message eventually sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                        break
+                        break;
                     } catch ( WebException exception2 ) {
                         System.IO.File.AppendAllLines(localUsersData.LogFilepath, exception2.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
                         //System.Windows.Forms.MessageBox.Show("New attempt failed because of a Web Exception\nArgument string used was:\n" + argument + "\n\n" + exception2, "Message not sent again", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
@@ -186,7 +186,7 @@ namespace myTelegramBot {
                         return false;
                     }
 
-            string command = message.text.Substring(message.entities[0].offset, message.entities[0].length);
+            string command = message.text.Substring(message.entities[0].offset, message.entities[0].length).ToLower();
             Userdata user = localUsersData.usersData[message.chat.id];
 
             switch ( command ) {

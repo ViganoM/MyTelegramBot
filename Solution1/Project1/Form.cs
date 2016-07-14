@@ -22,9 +22,6 @@ namespace myTelegramBot {
                     label_time_workingAverage.Text = WorkingTimes.Average().ToString("#.0 ms");
             }
         }
-        public int WaitingTime {
-            set { label_time_waiting.Text = value.ToString("# ms"); }
-        }
         public bool Working {
             set {
                 if ( value ) {
