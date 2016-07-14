@@ -2,28 +2,31 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="myTelegramBot.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="waitTime" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">500</Value>
+    <Setting Name="updateLoopSleepDuration_ms" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">300</Value>
     </Setting>
-    <Setting Name="lastUpdate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="settingFilename" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SavedData</Value>
     </Setting>
-    <Setting Name="DataPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\</Value>
+    <Setting Name="userUpdatePeriod_day" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="datetimeFormat" Type="System.String" Scope="Application">
       <Value Profile="(Default)">_yyyy.MM.dd..HH:mm.ss</Value>
     </Setting>
-    <Setting Name="DataFileName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">BotSavedData</Value>
+    <Setting Name="maxDataFolderSize_MB" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="lastDataFileName" Type="System.String" Scope="User">
+    <Setting Name="DataFolderPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\</Value>
+    </Setting>
+    <Setting Name="lastSettingFilename" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="updateUserTime" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+    <Setting Name="minResponseTime_s" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="minResponseTime" Type="System.Double" Scope="User">
+    <Setting Name="lastUpdateId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

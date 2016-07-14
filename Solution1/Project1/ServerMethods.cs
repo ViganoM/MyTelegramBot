@@ -59,9 +59,7 @@ namespace myTelegramBot {
             try {
                 response = new WebClient().DownloadString(website + "getUpdates" + argument);
             } catch ( WebException exception ) {
-                string path = localUsersData.SavePath + "_log" + DateTime.Now.ToString(Settings.Default.datetimeFormat);
-                System.IO.File.WriteAllText(path, exception.ToString());
-                Program.form.WriteToConsole("A WebException occoured in GetUpdate. Informations were written in file " + path, Color.Red);
+                System.IO.File.AppendAllLines(localUsersData.LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
                 return new getUpdates();
             }
             getUpdates getUpdates = new JavaScriptSerializer().Deserialize<getUpdates>(response);
@@ -113,16 +111,18 @@ namespace myTelegramBot {
             try {
                 response = new WebClient().DownloadString(website + "sendMessage" + argument);
             } catch ( WebException exception ) {
-                System.Windows.Forms.MessageBox.Show("Cannot send a message because of a Web Exception\n\n" + exception.ToString(), "Message not sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
+                System.IO.File.AppendAllLines(localUsersData.LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+               // System.Windows.Forms.MessageBox.Show("Cannot send a message because of a Web Exception\n\n" + exception.ToString(), "Message not sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
                 while ( argument.Split('&').Length > 2 ) {
                     argument = argument.Replace(argument.Split('&').Last(x => x.Length > 0), "");
                     argument = argument.Remove(argument.Length - 1);
                     try {
                         response = new WebClient().DownloadString(website + "sendMessage" + argument);
-                        System.Windows.Forms.MessageBox.Show("New attempt was succesfull\nArgument string used was:\n" + argument, "Message eventually sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                        break;
+                        //System.Windows.Forms.MessageBox.Show("New attempt was succesfull\nArgument string used was:\n" + argument, "Message eventually sent", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                        break
                     } catch ( WebException exception2 ) {
-                        System.Windows.Forms.MessageBox.Show("New attempt failed because of a Web Exception\nArgument string used was:\n" + argument + "\n\n" + exception2, "Message not sent again", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
+                        System.IO.File.AppendAllLines(localUsersData.LogFilepath, exception2.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+                        //System.Windows.Forms.MessageBox.Show("New attempt failed because of a Web Exception\nArgument string used was:\n" + argument + "\n\n" + exception2, "Message not sent again", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Hand);
                     }
                 }
             }
