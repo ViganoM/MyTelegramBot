@@ -7,3 +7,7 @@ V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\my
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.Form.resources
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.Properties.Resources.resources
 V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.csproj.GenerateResource.Cache
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\bin\Release\myTelegramBot.exe.manifest
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\bin\Release\myTelegramBot.application
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.exe.manifest
+V:\Michele\OTHERS\Scripting\Workspace\Telegram\Solution1\Project1\obj\Release\myTelegramBot.application

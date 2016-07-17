@@ -24,16 +24,6 @@ namespace myTelegramBot {
         static List<string> HTMLstyle = new List<string>()  { "b", "strong", "i", "em", "a", "code", "pre" };
         public static int lastUpdate = 0;
 
-        /*GetUpdates
-        static public getUpdates GetUpdates(int limit = 100) {
-            string argument = string.Format("?limit={0}", limit);
-            return GetUpdates(argument);
-        }
-        static public getUpdates GetUpdates(int offset, int limit = 100) {
-            string argument = string.Format("?offset={0}&limit={1}", offset, limit);
-            return GetUpdates(argument);
-        }
-        */
         static public getUpdates GetUnreadUpdates(int limit = 100) {
             string argument = string.Format("?offset={0}&limit={1}", lastUpdate + 1, limit);
             return GetUpdates(argument);
@@ -138,40 +128,6 @@ namespace myTelegramBot {
             return new JavaScriptSerializer().Deserialize<getChat>(response);
         }
 
-        /*Photos
-        public static Bitmap getUserPhoto(int user_id) {
-            PhotoSize photo = new PhotoSize();
-            UserProfilePhotos userprofilephotos = getUserProfilePhotos(user_id);    //TODO photos are not deserialized!
-            PhotoSize[][] photoListList = userprofilephotos.photos;
-            if ( photoListList == null || photoListList.Length == 0 )
-                return new Bitmap(Resources.MyIcon.ToBitmap());
-
-            foreach ( PhotoSize p in photoListList.Last() )
-                if ( photo.height < p.height )
-                    photo = p;
-
-            return new Bitmap(DownloadFile(getFile(photo.file_id).file_path));
-        }
-
-        static UserProfilePhotos getUserProfilePhotos(int user_id, int offset = 0, int limit = 100) {
-            string argument = string.Format("?user_id={0}&offset={1}&limit={2}", user_id, offset, limit);
-            string response = new WebClient().DownloadString(website + "getUserProfilePhotos" + argument);
-            return new JavaScriptSerializer().Deserialize<UserProfilePhotos>(response);
-        }
-        static File getFile(string file_id) {
-            string response = new WebClient().DownloadString(website + "getFile" + "?file_id=" + file_id);
-            return new JavaScriptSerializer().Deserialize<File>(response);
-        }
-        static string DownloadFile(string file_path) {
-            string path = Settings.Default.PhotoPath + file_path;
-            int n = 0;
-            while ( System.IO.File.Exists(path) )
-                path += string.Format(" {0}", n++);
-
-            new WebClient().DownloadFile(fileWebsite + file_path, path);
-            return path;
-        }
-        */
         static public bool ParseMessage(Message message) {
             if ( message.entities == null || message.entities.Count == 0 )
                 return false;

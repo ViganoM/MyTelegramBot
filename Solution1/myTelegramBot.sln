@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Artistic.ico = Artistic.ico
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication", "WebApplication\WebApplication.csproj", "{60174FEF-93AB-4B81-B2F0-0CF09D9153FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,9 +19,12 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{40154CA0-7922-4F82-9446-E3C567285097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{40154CA0-7922-4F82-9446-E3C567285097}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40154CA0-7922-4F82-9446-E3C567285097}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40154CA0-7922-4F82-9446-E3C567285097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60174FEF-93AB-4B81-B2F0-0CF09D9153FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60174FEF-93AB-4B81-B2F0-0CF09D9153FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60174FEF-93AB-4B81-B2F0-0CF09D9153FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60174FEF-93AB-4B81-B2F0-0CF09D9153FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

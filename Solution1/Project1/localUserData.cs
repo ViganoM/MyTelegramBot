@@ -18,13 +18,6 @@ namespace myTelegramBot {
         public static string now {
             get { return DateTime.Now.ToString(Settings.Default.datetimeFormat); }
         }
-        static string LoadFilepath {
-            get {
-                if ( !Directory.Exists(Settings.Default.DataFolderPath) )
-                    Directory.CreateDirectory(Settings.Default.DataFolderPath);
-                return Settings.Default.DataFolderPath + Settings.Default.settingFilename + Settings.Default.lastSettingFilename;
-            }
-        }
         public static string SaveFilepath {
             get {
                 if ( !Directory.Exists(Settings.Default.DataFolderPath) )
@@ -35,6 +28,7 @@ namespace myTelegramBot {
         public static string LogFilepath { get { return Settings.Default.DataFolderPath + Settings.Default.settingFilename + "_LOG.txt"; } }
 
         public static Dictionary<int, Userdata> usersData { get; private set; } = new Dictionary<int, Userdata>();
+        public static App appInfo = new App();
 
         public static bool AddUser(Chat chat, User user) {
             if ( usersData.ContainsKey(chat.id) )
@@ -42,90 +36,76 @@ namespace myTelegramBot {
 
             Userdata userdata = new Userdata(chat, user);
             usersData.Add(chat.id, userdata);
-            Program.form.SetUser(userdata);
-            Program.form.WriteToConsole("User " + user.username + " added", Color.Violet);
+            //  Program.form.SetUser(userdata);
             return true;
         }
 
         public static void UpdateForm() {
             if ( usersData.Count > 0 )
-                Program.form.SetUsers(usersData.Values.ToList());
+                ;//    Program.form.SetUsers(usersData.Values.ToList());
             else
-                Program.form.SetUsers(new List<Userdata>());
+                ;//  Program.form.SetUsers(new List<Userdata>());
         }
 
         public static void SaveData() {
-            string end = now;
+            appInfo.lastUpdateId = ServerMethods.lastUpdate;
+            object graph = new Tuple<Dictionary<int, Userdata>, App>(usersData, appInfo);
             try {
-                new BinaryFormatter().Serialize(new FileStream(SaveFilepath + end, FileMode.Create, FileAccess.Write), usersData);
-                Settings.Default.lastSettingFilename = end;
+                new BinaryFormatter().Serialize(new FileStream(SaveFilepath + now, FileMode.Create, FileAccess.Write), graph);
             } catch ( SerializationException exception ) {
                 System.IO.File.AppendAllLines(LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
-                //MessageBox.Show("Settings could not be saved.\nA new attempt will be made 1 second after this box will be closed.\nSettings will be saved in folder:\n" + Settings.Default.DataFolderPath + "\nin a file whose name starts with:\n" + Settings.Default.settingFilename + "\nplus date and time of saving, in format:\n" + Settings.Default.datetimeFormat + "\nplus:\n_2nd\n\n" + exception.ToString(), "Settings not saved", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Thread.Sleep(1000);
-                end = now;
-                try {
-                    new BinaryFormatter().Serialize(new FileStream(SaveFilepath + end + "_2nd", FileMode.Create, FileAccess.Write), usersData);
-                    Settings.Default.lastSettingFilename = end + "_2nd";
-                    //MessageBox.Show("Settings were eventually saved at:\n" + Settings.Default.DataFolderPath + end + "_2nd\nPlease manually manage the settings files", "Settings eventually saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                } catch ( SerializationException exception2 ) {
-                    System.IO.File.AppendAllLines(LogFilepath, exception2.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
-                    System.IO.File.AppendAllLines(LogFilepath, new string[] { "-------", now, "Data not saved" });
-                    //MessageBox.Show("Settings were not be saved.\nData will be lost\n" + exception2.ToString(), "Settings definitively not saved", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                SecondSave();
+            } catch ( IOException exception ) {
+                System.IO.File.AppendAllLines(LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+                SecondSave();
             }
-            Settings.Default.lastUpdateId = ServerMethods.lastUpdate;
-            Settings.Default.Save();
+            DeleteOld();
         }
+        static void SecondSave() {
+            Thread.Sleep(1000);
+            object graph = new Tuple<Dictionary<int, Userdata>, App>(usersData, appInfo);
+            try {
+                new BinaryFormatter().Serialize(new FileStream(SaveFilepath + now + "_2nd", FileMode.Create, FileAccess.Write), graph);
+                return;
+            } catch ( SerializationException exception ) {
+                System.IO.File.AppendAllLines(LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+            } catch ( IOException exception ) {
+                System.IO.File.AppendAllLines(LogFilepath, exception.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
+            }
+            System.IO.File.AppendAllLines(LogFilepath, new string[] { "-------", now, "Data not saved" });
+        }
+
         public static bool LoadData(bool reset = false) {
             if ( reset ) {
                 Settings.Default.Reset();
-                Settings.Default.Save();
                 Environment.Exit(0);
             }
-
-            ServerMethods.lastUpdate = Settings.Default.lastUpdateId;
-            if ( Settings.Default.minResponseTime_s <= 0)
-                Settings.Default.minResponseTime_s = double.MaxValue;
-
-            try {
-                usersData = new BinaryFormatter().Deserialize(new FileStream(LoadFilepath, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
-                #region update non serialized stuff
-                foreach ( Userdata userdata in usersData.Values )
-                    userdata.Restore();
-
-                #endregion
-                return true;
-            } catch ( FileNotFoundException fileNotFound ) {
-                System.IO.File.AppendAllLines(LogFilepath, fileNotFound.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
-                //MessageBox.Show("Settings not restored because the file could not be found:\n" + LoadFilepath + "\nA new attempt will be made looking for older files after this box will be closed\n\n" + fileNotFound.ToString(), "Settings not restored", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return SecondLoad();
-            } catch ( SerializationException serializationEx ) {
-                System.IO.File.AppendAllLines(LogFilepath, serializationEx.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
-                return SecondLoad();
-            }
+            return SecondLoad();
         }
-
         static bool SecondLoad() {
             FileInfo[] list = new DirectoryInfo(Settings.Default.DataFolderPath).GetFiles().Where(x => x.Name.StartsWith(Settings.Default.settingFilename)).Where(x => !x.Name.Contains("_LOG")).OrderByDescending(x => x.CreationTime).ToArray();
             foreach ( FileInfo file in list )
                 try {
-                    usersData = new BinaryFormatter().Deserialize(new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) as Dictionary<int, Userdata>;
-                    //MessageBox.Show("Settings restored from file:\n" + file.FullName + "\nInstead of file:\n" + LoadFilepath, "Settings restores from an unexpected file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Tuple<Dictionary<int, Userdata>, App> graph = new BinaryFormatter().Deserialize(new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) as Tuple<Dictionary<int, Userdata>, App>;
+                    //if graph is null throw ex
+                    usersData = graph.Item1;
+                    appInfo.lastUpdateId = graph.Item2.lastUpdateId;
+                    ServerMethods.lastUpdate = appInfo.lastUpdateId;
+                    appInfo.minResponseTime_s = graph.Item2.minResponseTime_s;
+                    foreach ( Userdata userdata in usersData.Values )
+                        userdata.Restore();
                     return true;
                 } catch ( SerializationException serializationEx ) {
-                    Program.form.WriteToConsole("Settings not restored from " + file.FullName, Color.Red);
+                    //   Program.form.WriteToConsole("Settings not restored from " + file.FullName, Color.Red);
                     System.IO.File.AppendAllLines(LogFilepath, serializationEx.ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
                 }
             System.IO.File.AppendAllLines(LogFilepath, (new Exception("Settings could not be restored from any file in path:\n" + Settings.Default.DataFolderPath)).ToString().Split(new string[] { "\n" }, StringSplitOptions.None).ToArray());
-            // MessageBox.Show("Settings not restored from any file in path:\n" + Settings.Default.DataFolderPath + "\nConsider to change the data saving folder", "Settings definitely not restored", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
             return false;
         }
 
         public static void DeleteOld() {
             FileInfo[] files = new DirectoryInfo(Settings.Default.DataFolderPath).GetFiles("*", SearchOption.AllDirectories).OrderBy(x => x.CreationTime).ToArray();
-            if ( files.Sum(x => x.Length) > 0 )//Settings.Default.maxDataFolderSize_MB * 1024 * 1024 )
+            if ( files.Sum(x => x.Length) >= Settings.Default.maxDataFolderSize_MB * 1024 * 1024 )
                 for ( int n = 0 ; n < files.Length / 2 ; n++ )
                     if ( !files[n].Name.Contains("_LOG") )
                         files[n].Delete();
@@ -156,13 +136,13 @@ namespace myTelegramBot {
             set {
                 if ( value >= 1 && value <= 5 )
                     _speed = value;
-                Program.form.SetUser(this);
+                //    Program.form.SetUser(this);
             }
         }
         activity _activity = activity.WaitingSend;
         public activity activity {
-            get { return _activity; } set
-            {
+            get { return _activity; }
+            set {
                 _activity = value;
                 switch ( _activity ) {
                     case activity.Inactive:
@@ -175,7 +155,7 @@ namespace myTelegramBot {
                         timer.Stop();
                         break;
                 }
-                Program.form.SetUser(this);
+                //  Program.form.SetUser(this);
             }
         }
         public bool notificate=true;
@@ -205,7 +185,7 @@ namespace myTelegramBot {
                 else {
                     timer.Interval = (nextMessageSent - DateTime.Now).TotalMilliseconds;
                     timer.Start();
-                    Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
+                    //      Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss"), Color.Blue);
                 }
             }
 
@@ -217,7 +197,6 @@ namespace myTelegramBot {
         }
 
         //TODO make delta time message related, and not use local time!
-        //TODO change string time format
         public void MessageInput(Update update) {
             lastUpdate = update.message.message_id;
             switch ( activity ) {
@@ -225,10 +204,10 @@ namespace myTelegramBot {
                     activity = activity.WaitingSend;
                     TimeSpan delta = DateTime.Now - lastMessageSent;
                     ServerMethods.sendMessage(chat.id, "Got it! You took " + delta.TotalSeconds.ToString("#0.000") + " seconds.");
-                    if ( delta.TotalSeconds < Settings.Default.minResponseTime_s ) {
+                    if ( delta.TotalSeconds < localUsersData.appInfo.minResponseTime_s ) {
                         ServerMethods.sendMessage(chat.id, "That's a new record!\nWould you like to share it with other users? (They will know your username and your record; if you did not set an username, your first name will be used instead)\nWrite <i>yes</i> for yes (case insensitive).\nWrite anything else for no.\nbtw: You will not receive other messagges until you answer me.");
                         activity = activity.PrivacyConsent;
-                        Settings.Default.minResponseTime_s = delta.TotalSeconds;
+                        localUsersData.appInfo.minResponseTime_s = delta.TotalSeconds;
                     } else if ( delta.TotalSeconds < response.Min() )
                         ServerMethods.sendMessage(chat.id, "That's a new personal record!\nYour previous record was " + response.Min().ToString("#0.000") + " seconds.");
                     _response.Add(delta.TotalSeconds);
@@ -241,7 +220,7 @@ namespace myTelegramBot {
                     break;
                 case activity.PrivacyConsent:
                     if ( update.message.text.ToLower() == "yes" )
-                        if ( response.Min() <= Settings.Default.minResponseTime_s )
+                        if ( response.Min() <= localUsersData.appInfo.minResponseTime_s )
                             ShareRecord();
                         else
                             ServerMethods.sendMessage(chat.id, "You took too long to answer. Strange right?\nThere is a new record now...");
@@ -257,7 +236,7 @@ namespace myTelegramBot {
         }
         void Next(bool soon = false) {
             if ( activity == activity.WaitingSend ) {
-                double addSeconds= double.MaxValue;
+                double addSeconds = double.MaxValue;
                 Random random = new Random();
                 if ( soon )
                     addSeconds = random.NextDouble() * 3600;    //between 0 and 1 hour
@@ -283,14 +262,13 @@ namespace myTelegramBot {
                 timer.Interval = addSeconds * 1000;
                 nextMessageSent = DateTime.Now.AddSeconds(addSeconds);
                 timer.Start();
-                Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss") + "of " + nextMessageSent.ToShortDateString(), Color.Blue);
+                //Program.form.WriteToConsole("Message scheduled for " + nextMessageSent.ToString("HH\\:mm\\.ss") + "of " + nextMessageSent.ToShortDateString(), Color.Blue);
             }
         }
         void Send(object sender, ElapsedEventArgs e) {
-            ServerMethods.sendMessage(chat.id, "Answer this!\nI sent this: " + DateTime.Now.ToString("HH:mm.ss.fff"), !notificate);
+            ServerMethods.sendMessage(chat.id, "Answer this!\nI sent this: " + DateTime.Now.ToString("H:mm:ss.fff"), !notificate);
             lastMessageSent = DateTime.Now;
             activity = activity.WaitingResponse;
-            Program.form.WriteToConsole("Scheduled message sent", Color.Blue);
         }
 
         public void SendStats() {
@@ -302,5 +280,11 @@ namespace myTelegramBot {
                 name = user.username;
             ServerMethods.sendBroadMessage("The user " + name + " just answered a message in " + response.Min().ToString("#.000") + " seconds!");
         }
+    }
+
+    [Serializable]
+    class App {
+        public double minResponseTime_s { get; set; } = double.MaxValue;
+        public int lastUpdateId { get; set; } = 0;
     }
 }

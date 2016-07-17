@@ -17,17 +17,11 @@
     <Setting Name="maxDataFolderSize_MB" Type="System.Single" Scope="Application">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="DataFolderPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\vigan\Desktop\foto cucina\Telegram\</Value>
+    <Setting Name="DataFolderPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:/users/vigan/Desktop/TelegramBot/</Value>
     </Setting>
-    <Setting Name="lastSettingFilename" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="minResponseTime_s" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">-1</Value>
-    </Setting>
-    <Setting Name="lastUpdateId" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="SavePeriod_s" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">10</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<publishData>
+    <publishProfile publishUrl="https://telegram.mvbot.com:8172/msdeploy.axd" msdeploySite="victormv-001-site1" destinationAppUrl="http://telegram.mvbot.com/" profileName="Default Settings" publishMethod="MSDeploy" userName="ifc\victormv-001" />
+</publishData>

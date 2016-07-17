@@ -68,51 +68,21 @@ namespace myTelegramBot.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\vigan\\Desktop\\foto cucina\\Telegram\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/users/vigan/Desktop/TelegramBot/")]
         public string DataFolderPath {
             get {
                 return ((string)(this["DataFolderPath"]));
             }
-            set {
-                this["DataFolderPath"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string lastSettingFilename {
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public float SavePeriod_s {
             get {
-                return ((string)(this["lastSettingFilename"]));
-            }
-            set {
-                this["lastSettingFilename"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public double minResponseTime_s {
-            get {
-                return ((double)(this["minResponseTime_s"]));
-            }
-            set {
-                this["minResponseTime_s"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int lastUpdateId {
-            get {
-                return ((int)(this["lastUpdateId"]));
-            }
-            set {
-                this["lastUpdateId"] = value;
+                return ((float)(this["SavePeriod_s"]));
             }
         }
     }
